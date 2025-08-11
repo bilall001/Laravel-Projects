@@ -21,7 +21,10 @@ class CategoryService
     {
         return $this->categoryRepo->getAllByUser($userId);
     }
-
+   public function getById($id)
+    {
+        return $this->categoryRepo->findById($id);
+    }
     public function createCategory($data)
     {
         return $this->categoryRepo->create($data);

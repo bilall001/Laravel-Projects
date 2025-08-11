@@ -18,9 +18,16 @@ class CategoryController extends Controller
 
     public function index(Request $request)
     {
-        return response()->json($this->categoryService->getUserCategories($request->user()->id));
+         $categories = $this->categoryService->getUserCategories($request->user()->id);
+
+    return view("categories.index", [
+        'categories' => $categories
+    ]);
     }
 
+    public function create(){
+        return view("Categories.create");
+    }
     public function store(Request $request)
     {
         $request->validate([
@@ -30,31 +37,36 @@ class CategoryController extends Controller
         $data = $request->only('name');
         $data['user_id'] = $request->user()->id;
 
-        $category = $this->categoryService->createCategory($data);
+        $this->categoryService->createCategory($data);
 
-     
-        return response()->json([
-            'category' =>$category,
-            'message' => 'Category created successfully'],201);
+         return redirect()
+        ->route('categories.index')
+        ->with('success', 'Category created successfully!');
     }
 
+    public function edit($id){
+        $category = $this->categoryService->getById($id);
+        return view("Categories.edit", compact('category'));
+    }
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        $category = $this->categoryService->updateCategory($id, $request->only('name'));
+        $this->categoryService->updateCategory($id, $request->only('name'));
 
-        return response()->json([
-            'category' =>$category,
-            'message' => 'Category updated successfully'],201);
+         return redirect()
+        ->route('categories.index')
+        ->with('success', 'Category Updated successfully!');
     }
 
     public function destroy($id)
     {
         $this->categoryService->deleteCategory($id);
 
-        return response()->json(['message' => 'Category deleted successfully']);
+        return redirect()
+        ->route('categories.index')
+        ->with('success', 'Category deleted successfully!');
     }
 }

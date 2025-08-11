@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Budget;
+use App\Models\Category;
 use App\Models\Expense;
 use App\Services\ExpenseServices;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,8 +22,8 @@ class ExpenseController extends Controller
     }
     public function index()
     {
-        $expense = $this->expenseService->getAllExpense();
-        return response()->json($expense);
+        $expenses = $this->expenseService->getAllExpense();
+        return view('Expenses.index',compact('expenses'));
     }
 
     /**
@@ -28,7 +31,22 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        //
+ $userId = Auth::id();
+
+    // 1. Fetch categories belonging to the user
+    $categories = Category::where('user_id', $userId)->get();
+
+    // 2. Get the current month budget for this user
+    //    (or you could use request('month') if you want a different month)
+      $currentMonth = now()->format('Y-m'); // e.g., 2025-08
+      $budget = Budget::where('user_id', $userId)
+        ->whereRaw("DATE_FORMAT(month, '%Y-%m') = ?", [$currentMonth])
+        ->orderBy('created_at', 'desc') // latest entry first
+        ->first();
+
+    // dd($budget);
+    // Pass to the view
+    return view('expenses.create', compact('categories', 'budget'));
     }
 
     /**
@@ -45,11 +63,10 @@ class ExpenseController extends Controller
             'expense_date'   => 'required|date',
         ]);
         $validation['user_id'] = Auth::id();
-        $expense = $this->expenseService->create($validation);
-        return response()->json([
-            'message' => 'Expense created successfully',
-            'expense' => $expense,
-        ], 201);
+        $this->expenseService->create($validation);
+      return redirect()
+        ->route('expenses.index')
+        ->with('success', 'Expense created successfully!');
 
     }
 
@@ -64,9 +81,23 @@ class ExpenseController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Expense $expense)
-    {
-        //
+    public function edit($id)
+    {   
+    $userId = Auth::id();
+
+    // 1. Fetch categories belonging to the user
+    $categories = Category::where('user_id', $userId)->get();
+
+    // 2. Get the current month budget for this user
+    //    (or you could use request('month') if you want a different month)
+      $currentMonth = now()->format('Y-m'); // e.g., 2025-08
+      $budget = Budget::where('user_id', $userId)
+        ->whereRaw("DATE_FORMAT(month, '%Y-%m') = ?", [$currentMonth])
+        ->orderBy('created_at', 'desc') // latest entry first
+        ->first();
+        $expense = $this->expenseService->expenseId($id);
+        return view('Expenses.edit',compact('expense','categories','budget'
+    ));
     }
 
     /**
@@ -87,10 +118,9 @@ class ExpenseController extends Controller
         if (!$expense) {
             return response()->json(['message' => 'Unauthorized or not found'], 403);
         }
-        return response()->json([
-            'message' => 'Expense updated successfully',
-            'expense' => $expense,
-        ], 201);
+        return redirect()
+        ->route('expenses.index')
+        ->with('success', 'Expense updated successfully!');
     }
 
     /**
@@ -102,8 +132,8 @@ class ExpenseController extends Controller
         if (!$deleted) {
             return response()->json(['message' => 'Unauthorized or not found'], 403);
         }
-        return response()->json([
-            'message' => "Expense deleted successfully",
-        ]);
+        return redirect()
+        ->route('expenses.index')
+        ->with('success', 'Expense deleted successfully!');
     }
 }

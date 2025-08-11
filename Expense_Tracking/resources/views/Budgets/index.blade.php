@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Categories')
+@section('title', 'Budgets')
 
 @push('styles')
 <style>
@@ -11,7 +11,7 @@
         background-color: #f8fafc;
     }
 
-    .category-card, .header-card {
+    .budget-card, .header-card {
         background: #ffffff;
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -86,42 +86,45 @@
 
     {{-- Header card --}}
     <div class="header-card d-flex justify-content-between align-items-center">
-        <h2 class="page-title">Categories</h2>
-        <a href="{{ route('categories.create') }}" class="btn btn-primary">Add Category</a>
+        <h2 class="page-title">Budgets</h2>
+        <a href="{{ route('budgets.create') }}" class="btn btn-primary">Add New Budget</a>
     </div>
 
-    @if(session('success'))
+    @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <div class="category-card">
+    <div class="budget-card">
         <table class="table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Created At</th>
+                    <th>ID</th>
+                    <th>Amount</th>
+                    <th>Month</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($categories as $index => $category)
+                @forelse ($budgets as $budget)
                     <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $category->name }}</td>
-                        <td>{{ $category->created_at->format('Y-m-d') }}</td>
+                        <td>{{ $budget->id }}</td>
+                        <td>Rs.{{ number_format($budget->amount, 2) }}</td>
+                        <td>{{ \Carbon\Carbon::parse($budget->month)->format('F Y') }}</td>
                         <td>
-                            <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST" style="display:inline-block">
+                            <a href="{{ route('budgets.edit', $budget->id) }}" class="btn btn-warning">Edit</a>
+                            <form action="{{ route('budgets.destroy', $budget->id) }}" method="POST" style="display:inline-block">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
+                                <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Are you sure you want to delete this budget?')">
+                                    Delete
+                                </button>
                             </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center">No categories found.</td>
+                        <td colspan="4" class="text-center">No budgets found.</td>
                     </tr>
                 @endforelse
             </tbody>

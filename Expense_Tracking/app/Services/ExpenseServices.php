@@ -21,7 +21,7 @@ class ExpenseServices
         return $this->expenseRepo->getAll(Auth::id());
     }
     public function expenseId($id){
-
+        return $this->expenseRepo->findUser($id);
     }
     public function create(array $data){
         $data['user_id'] = Auth::id();

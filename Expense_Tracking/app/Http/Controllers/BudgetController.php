@@ -19,25 +19,44 @@ class BudgetController extends Controller
     public function index()
     {
         $budgets = $this->budgetService->getAll(Auth::id());
-        return response()->json($budgets);
+        return view('Budgets.index',compact('budgets'));
     }
 
+    public function create(){
+        return view('Budgets.create');
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'amount' => 'required|numeric',
-            'month' => 'required'
+            'amount' => 'required|numeric|min:0|max:99999999.99',
+            'month' => 'required|date_format:Y-m'
         ]);
-
+        $validated['month'] = $validated['month'] . '-01';
         $validated['user_id'] = Auth::id();
-        $budget = $this->budgetService->create($validated);
+         $month = \Carbon\Carbon::parse($validated['month'])->startOfMonth();
+         $userId = Auth::id();
+         $existingBudget = Budget::where('user_id', $userId)
+        ->whereRaw("DATE_FORMAT(month, '%Y-%m') = ?", [$month->format('Y-m')])
+        ->first();
 
-        return response()->json([
-            'budget' => $budget,
-            'message' => 'Budget created successfully'
-        ], 201);
+    if ($existingBudget) {
+        return redirect()
+            ->back()
+            ->withInput()
+            ->withErrors(['month' => 'You have already created a budget for ' . $month->format('F Y') . '. You can update or delete it.']);
     }
 
+        $this->budgetService->create($validated);
+
+         return redirect()
+        ->route('budgets.index')
+        ->with('success', 'Budget created successfully!');
+    }
+
+    public function edit($id){
+        $budget = $this->budgetService->getById($id);
+        return view('Budgets.edit',compact('budget'));
+    }
     public function update(Request $request, $id)
     {
         $budget = $this->budgetService->getById($id);
@@ -47,16 +66,15 @@ class BudgetController extends Controller
         }
 
         $validated = $request->validate([
-            'amount' => 'required|numeric',
-            'month' => 'required'
+           'amount' => 'required|numeric|min:0|max:99999999.99',
+            'month' => 'required|date_format:Y-m'
         ]);
+         $validated['month'] = $validated['month'] . '-01';
+         $this->budgetService->update($budget, $validated);
 
-        $updated = $this->budgetService->update($budget, $validated);
-
-        return response()->json([
-            'budget' => $updated,
-            'message' => 'Budget updated successfully'
-        ]);
+        return redirect()
+        ->route('budgets.index')
+        ->with('success', 'Budget updated successfully!');
     }
 
     public function destroy($id)
@@ -68,7 +86,8 @@ class BudgetController extends Controller
         }
 
         $this->budgetService->delete($budget);
-
-        return response()->json(['message' => 'Budget deleted successfully']);
-    }
+        return redirect()
+        ->route('budgets.index')
+        ->with('success', 'Budget deleted successfully!');
+}
 }
