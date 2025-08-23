@@ -1,6 +1,6 @@
 @extends('admin.layouts.main')
 @section('title')
-Projects - HMS Tech  & Solutions
+Project - HMS Tech  & Solutions
 @endsection
 @section('content')
 <div class="container mt-5">

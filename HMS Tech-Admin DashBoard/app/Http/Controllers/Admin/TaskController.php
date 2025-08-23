@@ -48,8 +48,8 @@ public function getProjectInfo($title)
     if (!$project) {
         return response()->json(['error' => 'Project not found'], 404);
     }
-    // dd($project);
-    return response()->json($project);
+    dd($project);
+    return response()-json($project);
 
     // return response()->json([
     //     'id' => $project->id,

@@ -9,18 +9,23 @@ use App\Http\Controllers\Controller;
 
 class SalaryController extends Controller
 {
-    public function index(Request $request)
-    {
-        $month = $request->get('month', now()->format('Y-m'));
+   public function index(Request $request)
+{
+    // Get month from request, default to current month (YYYY-MM format)
+    $month = $request->get('month', now()->format('Y-m'));
 
-        $salaries = Salary::with('developer')
-                    ->whereRaw("DATE_FORMAT(salary_date, '%Y-%m') = ?", [$month])
-                    ->get();
+    // Fetch salaries with related user (add_users relationship)
+    $salaries = Salary::with('addUser')
+                ->whereRaw("DATE_FORMAT(salary_date, '%Y-%m') = ?", [$month])
+                ->get();
 
-        $developers = AddUser::where('role', 'developer')->get();
+    // ✅ Fetch all users (not just developers)
+    $users = AddUser::all();
 
-        return view('admin.pages.salary', compact('salaries', 'developers', 'month'));
-    }
+    // Return to view
+    return view('admin.pages.salary', compact('salaries', 'users', 'month'));
+}
+
 
     public function store(Request $request)
     {
@@ -38,10 +43,6 @@ class SalaryController extends Controller
         }
 
         $data['is_paid'] = $request->has('is_paid');
-
-        // ✅ Map correct FK field
-        $data['developer_id'] = $data['add_user_id'];
-        unset($data['add_user_id']);
 
         Salary::create($data);
 
@@ -65,8 +66,6 @@ class SalaryController extends Controller
         }
 
         $data['is_paid'] = $request->has('is_paid');
-        $data['developer_id'] = $data['add_user_id'];
-        unset($data['add_user_id']);
 
         $salary->update($data);
 

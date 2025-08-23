@@ -10,7 +10,6 @@ use App\Models\Developer;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class DeveloperController extends Controller
 {
@@ -22,13 +21,75 @@ class DeveloperController extends Controller
             $developer = Developer::where('add_user_id', $user->id)->first();
 
             if ($developer) {
-                $projects = Project::where('user_id', $user->id)->get();
-                $salary = Project::where('user_id', $user->id)->get();
-                // $salary = $developer->salaries()->orderBy('salary_date', 'desc')->get();
-                $attendance = Attendance::where('user_id', $user->id)->get();
+                $developer = Developer::where('add_user_id', $user->id)->first();
+                // $projects = Project::where('user_id', $user->id) // projects directly assigned to developer
+                //     ->orWhereHas('team.users', function ($query) use ($user) {
+                //         $query->where('add_users.id', $user->id); // projects assigned via team membership
+                //     })
+                //     ->count();
+
+                // $directProjects = Project::where('user_id', $user->id)->get();
+                // $directProjectsCount = $directProjects->count();
+                // $teamms = Team::whereHas('users', function ($query) use ($user) {
+                //     $query->where('add_users.id', $user->id);
+                // })->get();
+                // $teamProjects = Project::whereIn('team_id', $teamms->pluck('id'))->get();
+
+                // $teamProjectsCount = $teamProjects->count();
+                $directProjects = Project::where('user_id', $user->id)
+                    ->with('team', 'businessDeveloper')
+                    ->get()
+                    ->map(function ($project) {
+                        $project->assignment_type = 'Individual';
+                        return $project;
+                    });
+                $directProjectsCount = $directProjects->count();
+
+                // 🔹 Teams the developer belongs to
                 $teams = Team::whereHas('users', function ($query) use ($user) {
                     $query->where('add_users.id', $user->id);
                 })->with('users')->get();
+
+                // 🔹 Team projects
+                $teamProjects = Project::whereIn('team_id', $teams->pluck('id'))
+                    ->with('team', 'businessDeveloper')
+                    ->get()
+                    ->map(function ($project) {
+                        $project->assignment_type = 'Team';
+                        return $project;
+                    });
+                $teamProjectsCount = $teamProjects->count();
+
+                // 🔹 Combine projects for table
+                $allProjects = $directProjects->concat($teamProjects);
+                // dd($allProjects);
+                // $salary = Salary::where('add_user_id', $user->id)
+                //     ->orderBy('salary_date', 'desc')
+                //     ->get();
+                $salaries = Salary::where('add_user_id', $user->id)
+                    ->where('is_paid', 1)
+                    ->orderByDesc('salary_date')
+                    ->get();
+                $attendanceQuery = Attendance::where('user_id', $user->id)
+                    ->whereMonth('date', now()->month)
+                    ->whereYear('date', now()->year);
+
+                $totalDays = $attendanceQuery->count();
+                // dd($totalDays);
+                $presentDays = (clone $attendanceQuery)->where('status', 'present')->count();
+                $absentDays = (clone $attendanceQuery)->where('is_absent', 1)->count();
+                $leaveDays = (clone $attendanceQuery)->where('is_leave', 1)->count();
+                $attendancePercentage = $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0;
+
+                $teams = Team::whereHas('users', function ($query) use ($user) {
+                    $query->where('add_users.id', $user->id);
+                })
+                    ->with(['users' => function ($query) use ($user) {
+                        $query->where('add_users.id', '!=', $user->id); // exclude current developer
+                    }])
+                    ->get();
+                // dd($teams);
+                $teamCount = $teams->count();
             } else {
                 $projects = collect();
                 $salary = collect();
@@ -38,10 +99,17 @@ class DeveloperController extends Controller
 
             return view('admin.pages.developers.dashboard', compact(
                 'developer',
-                'projects',
+                'directProjectsCount',
+                'teamProjectsCount',
+                'allProjects',
                 'teams',
-                'salary',
-                'attendance'
+                'teamCount',
+                'salaries',
+                'totalDays',
+                'presentDays',
+                'absentDays',
+                'leaveDays',
+                'attendancePercentage',
             ));
         } else {
             $developers = Developer::orderBy('created_at', 'desc')->get();
@@ -49,6 +117,53 @@ class DeveloperController extends Controller
 
             return view('admin.pages.developers.add_developer', compact('developers', 'users'));
         }
+    }
+
+    /**
+     * 🔹 Dedicated dashboard for developers
+     */
+    public function dashboard()
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'developer') {
+            abort(403, 'Unauthorized');
+        }
+
+        $developer = Developer::where('add_user_id', $user->id)->first();
+        $projects = Project::where('user_id', $user->id)->get();
+        // $salary = Salary::where('add_user_id', $user->id)
+        //     ->orderBy('salary_date', 'desc')
+        //     ->get();
+        $salaries = Salary::where('add_user_id', $user->id)
+            ->where('is_paid', 1)
+            ->orderByDesc('salary_date')
+            ->get();
+        $attendanceQuery = Attendance::where('user_id', $user->id)
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year);
+
+        $totalDays = $attendanceQuery->count();
+        // dd($totalDays);
+        $presentDays = (clone $attendanceQuery)->where('status', 'present')->count();
+        $absentDays = (clone $attendanceQuery)->where('is_absent', 1)->count();
+        $leaveDays = (clone $attendanceQuery)->where('is_leave', 1)->count();
+        $attendancePercentage = $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0;
+        $teams = Team::whereHas('users', function ($query) use ($user) {
+            $query->where('add_users.id', $user->id);
+        })->with('users')->get();
+
+        return view('admin.pages.developers.dashboard', compact(
+            'developer',
+            'projects',
+            'teams',
+            'salaries',
+            'totalDays',
+            'presentDays',
+            'absentDays',
+            'leaveDays',
+            'attendancePercentage',
+        ));
     }
 
     public function create()
@@ -75,39 +190,18 @@ class DeveloperController extends Controller
             'salary_type' => 'nullable|string|in:salary,project',
         ]);
 
-        // Reset all work type booleans first
-        $data['part_time'] = false;
-        $data['full_time'] = false;
-        $data['internship'] = false;
-        $data['job'] = false;
+        // Reset work types
+        $data['part_time'] = $data['time_type'] === 'part_time';
+        $data['full_time'] = $data['time_type'] === 'full_time';
+        $data['internship'] = $data['job_type'] === 'internship';
+        $data['job'] = $data['job_type'] === 'job';
 
-        // Set booleans based on the input radio selections
-        if (isset($data['time_type'])) {
-            if ($data['time_type'] === 'part_time') {
-                $data['part_time'] = true;
-            } elseif ($data['time_type'] === 'full_time') {
-                $data['full_time'] = true;
-            }
-        }
-
-        if (isset($data['job_type'])) {
-            if ($data['job_type'] === 'internship') {
-                $data['internship'] = true;
-            } elseif ($data['job_type'] === 'job') {
-                $data['job'] = true;
-            }
-        }
-
-        // Save salary_type as well if you want to store it in DB, else remove this
-        $data['salary_type'] = $data['salary_type'] ?? null;
-
-        // File uploads
         foreach (['profile_image', 'cnic_front', 'cnic_back', 'contract_file'] as $fileField) {
             if ($request->hasFile($fileField)) {
                 $file = $request->file($fileField);
-                $filename = time().'_'.$file->getClientOriginalName();
+                $filename = time() . '_' . $file->getClientOriginalName();
                 $file->move(public_path('uploads/developers'), $filename);
-                $data[$fileField] = 'uploads/developers/'.$filename;
+                $data[$fileField] = 'uploads/developers/' . $filename;
             }
         }
 
@@ -123,71 +217,46 @@ class DeveloperController extends Controller
         return view('admin.pages.developers.add_developer', compact('developer'));
     }
 
-public function update(Request $request, string $id)
-{
-    $developer = Developer::findOrFail($id);
+    public function update(Request $request, string $id)
+    {
+        $developer = Developer::findOrFail($id);
 
-    $data = $request->validate([
-        'add_user_id' => 'required|exists:add_users,id',
-        'skill' => 'nullable|string',
-        'experience' => 'nullable|string',
-        'salary' => 'nullable|numeric',
-        'profile_image' => 'nullable|image',
-        'cnic_front' => 'nullable|image',
-        'cnic_back' => 'nullable|image',
-        'contract_file' => 'nullable|file',
-        'time_type' => 'nullable|string|in:part_time,full_time',
-        'job_type' => 'nullable|string|in:internship,job',
-    ]);
+        $data = $request->validate([
+            'add_user_id' => 'required|exists:add_users,id',
+            'skill' => 'nullable|string',
+            'experience' => 'nullable|string',
+            'salary' => 'nullable|numeric',
+            'profile_image' => 'nullable|image',
+            'cnic_front' => 'nullable|image',
+            'cnic_back' => 'nullable|image',
+            'contract_file' => 'nullable|file',
+            'time_type' => 'nullable|string|in:part_time,full_time',
+            'job_type' => 'nullable|string|in:internship,job',
+        ]);
 
-    $developer->add_user_id = $data['add_user_id'];
-    $developer->skill = $data['skill'] ?? null;
-    $developer->experience = $data['experience'] ?? null;
-    $developer->salary = $data['salary'] ?? null;
+        $developer->fill($data);
 
-    // Reset work type booleans
-    $developer->part_time = false;
-    $developer->full_time = false;
-    $developer->internship = false;
-    $developer->job = false;
+        $developer->part_time = $data['time_type'] === 'part_time';
+        $developer->full_time = $data['time_type'] === 'full_time';
+        $developer->internship = $data['job_type'] === 'internship';
+        $developer->job = $data['job_type'] === 'job';
 
-    // Set based on submitted 'time_type' (radio)
-    if (!empty($data['time_type'])) {
-        if ($data['time_type'] === 'part_time') {
-            $developer->part_time = true;
-        } elseif ($data['time_type'] === 'full_time') {
-            $developer->full_time = true;
-        }
-    }
-
-    // Set based on submitted 'job_type' (radio)
-    if (!empty($data['job_type'])) {
-        if ($data['job_type'] === 'internship') {
-            $developer->internship = true;
-        } elseif ($data['job_type'] === 'job') {
-            $developer->job = true;
-        }
-    }
-
-    // File uploads with old file cleanup
-    foreach (['profile_image', 'cnic_front', 'cnic_back', 'contract_file'] as $fileField) {
-        if ($request->hasFile($fileField)) {
-            if ($developer->$fileField && file_exists(public_path($developer->$fileField))) {
-                unlink(public_path($developer->$fileField));
+        foreach (['profile_image', 'cnic_front', 'cnic_back', 'contract_file'] as $fileField) {
+            if ($request->hasFile($fileField)) {
+                if ($developer->$fileField && file_exists(public_path($developer->$fileField))) {
+                    unlink(public_path($developer->$fileField));
+                }
+                $file = $request->file($fileField);
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/developers'), $filename);
+                $developer->$fileField = 'uploads/developers/' . $filename;
             }
-            $file = $request->file($fileField);
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/developers'), $filename);
-            $developer->$fileField = 'uploads/developers/'.$filename;
         }
+
+        $developer->save();
+
+        return redirect()->route('developers.index')->with('success', 'Developer updated successfully!');
     }
-
-    $developer->save();
-
-    return redirect()->route('developers.index')->with('success', 'Developer updated successfully!');
-}
-
-
 
     public function destroy(string $id)
     {

@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')
                   ->constrained('projects')
-                  ->onDelete('cascade'); // If a project is deleted, delete its schedules
-            $table->string('title');
+                  ->onDelete('cascade'); // If a project is deleted, delete its schedule
             $table->date('date');
             $table->string('status'); // better to store as string, not text
             $table->timestamps();

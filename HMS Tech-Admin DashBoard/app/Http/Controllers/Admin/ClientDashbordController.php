@@ -13,9 +13,9 @@ class ClientDashbordController extends Controller
     public function dashboard()
     {
         // Find the client record for logged-in user
-        $clientModel = Client::where('user_id', Auth::id())->first();
+        $client = Client::where('user_id', Auth::id())->first();
 
-        if (!$clientModel) {
+        if (!$client) {
             return view('admin.pages.clients.dashboard', [
                 'client' => Auth::user(),
                 'projects' => collect(),
@@ -30,23 +30,37 @@ class ClientDashbordController extends Controller
         }
 
         // Get projects linked to this client
-        $projects = Project::where('client_id', $clientModel->id)->get();
+        // $projects = Project::where('client_id', $clientModel->id)->get();
+        $projects = $client
+            ? Project::where('client_id', $client->id)
+            ->with(['schedules' => function ($query) {
+                $query->orderByDesc('id'); // latest schedule first
+            }])
+            ->get()
+            : collect();
 
         $totalProjects = $projects->count();
-        $currentProjects = $projects->where('status', '!=', 'completed')->count();
-        $completedProjects = $projects->where('status', 'completed')->count();
+        $completedProjects = Project::where('client_id', $client->id)
+            ->whereHas('schedules', function ($query) {
+                $query->where('status', 'completed');
+            })->count();
+
+        $currentProjects = Project::where('client_id', $client->id)
+            ->whereHas('schedules', function ($query) {
+                $query->where('status', 'inProgress');
+            })->count();
 
         // Use price, paid_price and remaining_price fields from table
         $totalAmountSpent = $projects->sum('price');
         $totalPaid = $projects->sum('paid_price');
         $remainingAmount = $projects->sum('remaining_price');
-       $amountspent = $projects->sum('paid_price');
+        $amountspent = $projects->sum('paid_price');
         // Latest project by creation date
         $latestProject = $projects->sortByDesc('created_at')->first();
         $previousProjects = $projects->sortByDesc('created_at')->skip(1);
 
         return view('admin.pages.clients.dashboard', compact(
-            'clientModel',
+            'client',
             'projects',
             'totalProjects',
             'currentProjects',

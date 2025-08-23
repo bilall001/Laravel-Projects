@@ -37,19 +37,28 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Redirect root to login or dashboard
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('admin.index')
-        : redirect()->route('login.form');
+    if (!auth()->check()) {
+        return redirect()->route('login.form');
+    }
+    $user = auth()->user();
+
+    return match ($user->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'business developer' => redirect()->route('business-developer.dashboard'),
+        'client' => redirect()->route('client.dashboard'),
+        'partner' => redirect()->route('admin.index'),
+        'team manager' => redirect()->route('teamManager.dashboard'),
+        'developer' => redirect()->route('developer.dashboard'),
+        default => redirect()->route('login.form'),
+    };
 });
+
 
 // Everything below here requires authentication
 Route::middleware(['auth'])->group(function () {
 
     // Admin Dashboard
-    Route::get('/admin', function () {
-        return view('admin.index');
-    })->name('admin.index');
-    Route::get('/', [AdminController::class, 'TotalCLients'])->name('admin.index');
+    Route::get('/admin', [AdminController::class, 'TotalCLients'])->name('admin.index');
 
     // Passwords
     Route::resource('passwords', PasswordControler::class);
@@ -79,14 +88,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/client/dashboard', [ClientDashbordController::class, 'dashboard'])
         ->middleware(['role:client'])
         ->name('client.dashboard');
-        // Team Managers Dashboard
+    // developer dashboard
+    Route::get('/developer/dashboard', [DeveloperController::class, 'index'])
+        ->middleware(['role:developer'])
+        ->name('developer.dashboard');
+    // Team Managers Dashboard
     Route::get('/TeamManager/dashboard', [TeamManagerDashboardController::class, 'index'])
         ->middleware(['role:team manager'])
         ->name('teamManager.dashboard');
-        // partner dashboard
-    Route::get('/partner/dashboard', [PartnerController::class, 'dashboard'])
-        ->middleware(['role:team manager'])
-        ->name('partner.dashboard');
 
     // Attendance
     Route::prefix('admin')->name('attendances.')->group(function () {
@@ -149,4 +158,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('business-developers', BusinessDeveloperController::class);
     Route::get('business-developer/dashboard', [BusinessDeveloperController::class, 'dashboard'])
         ->name('business-developer.dashboard');
+});
+
+
+
+Route::middleware(['auth', 'role:partner'])->group(function () {
+    Route::get('/partner/dashboard', [PartnerController::class, 'dashboard'])->name('partner.dashboard');
 });

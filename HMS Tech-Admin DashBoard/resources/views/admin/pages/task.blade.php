@@ -1,6 +1,6 @@
 @extends('admin.layouts.main')
 @section('title')
-Tasks - HMS Tech  & Solutions
+Tasks - HMS Tech & Solutions
 @endsection
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@ Tasks - HMS Tech  & Solutions
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="page-title">Manage Tasks</h4>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#assignTaskModal" id="createTaskBtn">Assign Task</button>
+        <button class="btn btn-primary" id="createTaskBtn">Assign Task</button>
     </div>
 
     {{-- Success Message --}}
@@ -18,10 +18,10 @@ Tasks - HMS Tech  & Solutions
 
     {{-- Tasks Table --}}
     <div class="card">
-        <div class="card-header">All Tasks</div>
+        <div class="card-header text-white" style="background-color: #1D2C48">All Tasks</div>
         <div class="card-body table-responsive">
-            <table class="table table-bordered">
-                <thead>
+            <table class="table table-hover mb-0">
+                <thead class="table-primary">
                     <tr>
                         <th>#</th>
                         <th>Project Title</th>
@@ -50,7 +50,7 @@ Tasks - HMS Tech  & Solutions
                             <td>{{ ucfirst($t->project->type ?? '-') }}</td>
                             <td>{{ $t->team->name ?? '-' }}</td>
                             <td>{{ $t->user->name ?? '-' }}</td>
-                            <td>{{ $t->project->client->user->name ?? '-' }}</td>
+                            <td>{{ $t->project->client->name ?? '-' }}</td>
                             <td>{{ $t->description }}</td>
                             <td>{{ $t->end_date }}</td>
                             <td>
@@ -84,16 +84,16 @@ Tasks - HMS Tech  & Solutions
 </div>
 
 <!-- Modal: Assign/Edit Task -->
-<div class="modal fade" id="assignTaskModal" tabindex="-1" role="dialog" aria-labelledby="assignTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="assignTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <form method="POST" id="taskForm">
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Assign/Edit Task</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span>&times;</span>
+                    <button type="button" id="closeTaskModalBtn" class="btn btn-sm" aria-label="Close">
+                        <i class="fas fa-times text-dark fs-5"></i>
                     </button>
                 </div>
 
@@ -152,16 +152,20 @@ Tasks - HMS Tech  & Solutions
 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Save Task</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="cancelTaskModalBtn" class="btn btn-secondary">Cancel</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-{{-- JS for filling modal --}}
+{{-- JS --}}
 <script>
-    // Load project info on title select
+document.addEventListener('DOMContentLoaded', function () {
+    const taskModal = new bootstrap.Modal(document.getElementById('assignTaskModal'));
+    const form = document.getElementById('taskForm');
+
+    // Load project info
     document.getElementById('projectTitleSelect')?.addEventListener('change', function () {
         const title = this.value;
         if (!title) return;
@@ -176,23 +180,24 @@ Tasks - HMS Tech  & Solutions
                 document.getElementById('assignedUser').value = data.user ? data.user.name : '';
                 document.getElementById('assignedClient').value = data.client && data.client.user ? data.client.user.name : 'N/A';
             })
-            .catch(err => alert("Could not fetch project info"));
+            .catch(err => {
+                console.error("Fetch error:", err);
+                alert("Could not fetch project info");
+            });
     });
 
-    // Open modal for create
+    // Create new task
     document.getElementById('createTaskBtn')?.addEventListener('click', function () {
-        const form = document.getElementById('taskForm');
         form.reset();
         form.action = "{{ route('admin.tasks.store') }}";
         document.getElementById('formMethod').value = 'POST';
+        taskModal.show();
     });
 
-    // Open modal for edit
+    // Edit task
     document.querySelectorAll('.edit-task-btn').forEach(btn => {
         btn.addEventListener('click', function () {
-            const form = document.getElementById('taskForm');
             const id = this.dataset.id;
-
             form.action = `/admin/tasks/${id}`;
             document.getElementById('formMethod').value = 'PUT';
 
@@ -206,8 +211,13 @@ Tasks - HMS Tech  & Solutions
             document.getElementById('taskEndDate').value = this.dataset.endDate;
             document.getElementById('taskDescription').value = this.dataset.description;
 
-            $('#assignTaskModal').modal('show');
+            taskModal.show();
         });
     });
+
+    // Close modal (cross ❌ & Cancel)
+    document.querySelectorAll('#assignTaskModal #closeTaskModalBtn, #assignTaskModal #cancelTaskModalBtn')
+        .forEach(btn => btn.addEventListener('click', () => taskModal.hide()));
+});
 </script>
 @endsection

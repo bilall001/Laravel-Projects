@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\Admin\BusinessDeveloperController;
 use App\Models\Team;
 use App\Models\AddUser;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,7 @@ protected $casts = [
 ];
 
 public function client() {
-    return $this->belongsTo(Client::class,'client_id');
+    return $this->belongsTo(Client::class);
 }
 
  public function user()
@@ -30,5 +31,18 @@ public function client() {
 public function team()
 {
     return $this->belongsTo(Team::class, 'team_id');
+}
+public function teams()
+{
+    return $this->belongsToMany(Team::class, 'team_user', 'project_id', 'team_id');
+}
+
+public function businessDeveloper()
+{
+    return $this->belongsTo(AddUser::class, 'business_developer_id');
+}
+public function schedules()
+{
+    return $this->hasMany(ProjectSchedule::class, 'project_id');
 }
 }

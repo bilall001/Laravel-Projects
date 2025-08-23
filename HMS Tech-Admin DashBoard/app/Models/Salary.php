@@ -12,12 +12,12 @@ class Salary extends Model
     use HasFactory;
 
     protected $fillable = [
-        'developer_id', 'salary_date', 'amount', 'payment_method',
+        'add_user_id', 'salary_date', 'amount', 'payment_method',
         'payment_receipt', 'is_paid',
     ];
 
-   public function developer()
+  public function addUser()
     {
-        return $this->belongsTo(AddUser::class, 'developer_id');
+        return $this->belongsTo(AddUser::class, 'add_user_id');
     }
 }

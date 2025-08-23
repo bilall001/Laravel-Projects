@@ -1,6 +1,6 @@
 @extends('admin.layouts.main')
 @section('title')
-Client - HMS Tech  & Solutions
+Client - HMS Tech & Solutions
 @endsection
 @section('content')
 <div class="container-fluid">
@@ -115,7 +115,7 @@ Client - HMS Tech  & Solutions
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Client</h5>
-                    <button type="button" class="btn btn-sm" data-bs-dismiss="modal">
+                    <button type="button" id="closeClientModalBtn" class="btn btn-sm">
                         <i class="fas fa-times text-dark fs-5"></i>
                     </button>
                 </div>
@@ -124,13 +124,12 @@ Client - HMS Tech  & Solutions
 
                     <div class="mb-3">
                         <label>Client</label>
-                      <select id="clientSelect" name="user_id" class="form-control" required>
-    <option value="">-- Select Client --</option>
-    @foreach($users as $user)
-        <option value="{{ $user->id }}" data-email="{{ $user->email }}">{{ $user->name }}</option>
-    @endforeach
-</select>
-
+                        <select id="clientSelect" name="user_id" class="form-control" required>
+                            <option value="">-- Select Client --</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}" data-email="{{ $user->email }}">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="mb-3">
@@ -156,7 +155,7 @@ Client - HMS Tech  & Solutions
 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Save Client</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="cancelClientModalBtn" class="btn btn-secondary">Cancel</button>
                 </div>
             </div>
         </form>
@@ -169,7 +168,7 @@ Client - HMS Tech  & Solutions
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Client Info</h5>
-                <button type="button" class="btn btn-sm" data-bs-dismiss="modal">
+                <button type="button" id="closeViewClientModalBtn" class="btn btn-sm">
                     <i class="fas fa-times text-dark fs-5"></i>
                 </button>
             </div>
@@ -178,6 +177,9 @@ Client - HMS Tech  & Solutions
                 <div class="mb-2"><strong>Email:</strong> <span id="viewEmail"></span></div>
                 <div class="mb-2"><strong>Phone:</strong> <span id="viewPhone"></span></div>
                 <div class="mb-2"><strong>Gender:</strong> <span id="viewGender"></span></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelViewClientModalBtn" class="btn btn-secondary">Close</button>
             </div>
         </div>
     </div>
@@ -188,6 +190,7 @@ Client - HMS Tech  & Solutions
 document.addEventListener("DOMContentLoaded", function () {
     const clientForm = document.getElementById('clientForm');
     const clientModal = new bootstrap.Modal(document.getElementById('clientModal'));
+    const viewClientModal = new bootstrap.Modal(document.getElementById('viewClientModal'));
     const modalTitle = document.querySelector('#clientModal .modal-title');
     const formMethod = document.getElementById('formMethod');
 
@@ -210,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             document.getElementById('clientSelect').value = this.dataset.user_id || '';
 
-            // Trigger change to fill email field
+            // Fill email based on selected option
             const select = document.getElementById('clientSelect');
             const option = select.options[select.selectedIndex];
             document.getElementById('clientEmail').value = option ? option.getAttribute('data-email') : '';
@@ -230,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('viewEmail').innerText = this.dataset.email;
             document.getElementById('viewPhone').innerText = this.dataset.phone;
             document.getElementById('viewGender').innerText = this.dataset.gender;
-            new bootstrap.Modal(document.getElementById('viewClientModal')).show();
+            viewClientModal.show();
         });
     });
 
@@ -239,6 +242,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const email = this.selectedOptions[0]?.getAttribute('data-email') || '';
         document.getElementById('clientEmail').value = email;
     });
+
+    // ✅ Close Add/Edit modal (❌ & Cancel)
+    document.querySelectorAll('#clientModal #closeClientModalBtn, #clientModal #cancelClientModalBtn')
+        .forEach(btn => btn.addEventListener('click', () => clientModal.hide()));
+
+    // ✅ Close View modal (❌ & Cancel)
+    document.querySelectorAll('#viewClientModal #closeViewClientModalBtn, #viewClientModal #cancelViewClientModalBtn')
+        .forEach(btn => btn.addEventListener('click', () => viewClientModal.hide()));
 });
 </script>
 @endsection

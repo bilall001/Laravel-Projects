@@ -19,8 +19,9 @@ class BusinessDeveloperController extends Controller
     public function index()
     {
         $developers = BusinessDeveloper::with('addUser')->get();
+        // ✅ role is "business developer" (with space)
         $users = AddUser::where('role', 'business developer')->get();
-        // dd($developers);
+
         return view('admin.pages.business-developer.busineesdeveloper', compact('developers', 'users'));
     }
 
@@ -75,35 +76,66 @@ class BusinessDeveloperController extends Controller
     /**
      * Show the dashboard for logged-in business developer
      */
-public function dashboard()
-{
-    $user = auth()->user();
+    public function dashboard()
+    {
+        $user = auth()->user();
+        // ✅ ensure role is "business developer"
+        if ($user->role !== 'business developer') {
+            abort(403, 'Unauthorized');
+        }
 
-    // Ensure this user is a business developer
-    if ($user->role !== 'business developer') {
-        abort(403, 'Unauthorized');
+        // Get Business Developer profile linked to this AddUser
+        $bd = BusinessDeveloper::where('add_user_id', $user->id)->firstOrFail();
+        // dd($bd->id);
+
+        // All projects assigned to this Business Developer
+        $projects = Project::where('business_developer_id', $user->id)->get();
+        // dd($projects);
+        // ✅ Stats
+        $totalProjects = $projects->count();
+        // Count current projects (status = inprogress)
+        $currentProjects = Project::whereHas('schedules', function ($query) {
+            $query->where('status', 'inProgress');
+        })->count();
+
+        // Count completed projects (status = completed)
+        $completedProjects = Project::whereHas('schedules', function ($query) {
+            $query->where('status', 'completed');
+        })->count();
+        // Attendance records
+        // Get projects assigned to this business developer
+        // $projects = Project::where('user_id', $user->id)->orWhere('team_id', $user->team_id)->get();
+
+        // Attendance for this month
+        $attendanceQuery = Attendance::where('user_id', $user->id)
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year);
+
+        $totalDays = $attendanceQuery->count();
+        $presentDays = (clone $attendanceQuery)->where('status', 'present')->count();
+        $absentDays = (clone $attendanceQuery)->where('is_absent', 1)->count();
+        $leaveDays = (clone $attendanceQuery)->where('is_leave', 1)->count();
+
+        $attendancePercentage = $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0;
+
+        $salaries = Salary::where('add_user_id', $user->id)
+            ->where('is_paid', 1)
+            ->orderByDesc('salary_date')
+            ->get();
+        return view('admin.pages.business-developer.dashboard', compact(
+            'bd',
+            'projects',
+            'totalProjects',
+            'currentProjects',
+            'completedProjects',
+            'totalDays',
+            'presentDays',
+            'absentDays',
+            'leaveDays',
+            'attendancePercentage',
+            'salaries'
+        ));
     }
-
-    // Get the Business Developer profile linked to this AddUser
-    $bd = BusinessDeveloper::where('add_user_id', $user->id)->firstOrFail();
-
-    // Projects assigned to this Business Developer
-    $projects = Project::where('business_developer_id', $bd->id)->get();
-
-    // Attendance records
-    $attendance = Attendance::where('user_id', $user->id)
-        ->orderBy('date', 'desc')
-        ->get();
-
-    // // Salary / payment records
-    // $salary = Salary::where('user_id', $user->id)
-    //     ->orderBy('salary_date', 'desc')
-    //     ->get();
-
-    // Return the dashboard view with all data
-    return view('admin.pages.business-developer.dashboard', compact('bd', 'projects', 'attendance'));
-}
-
 
     /**
      * Validate request data
@@ -122,7 +154,7 @@ public function dashboard()
     }
 
     /**
-     * Handle file uploads for image and CNIC
+     * Handle file uploads
      */
     private function handleUploads(Request $request, array &$data, $developer = null)
     {
@@ -135,9 +167,4 @@ public function dashboard()
             }
         }
     }
-
-
-
-
-
 }

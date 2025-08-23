@@ -41,9 +41,6 @@
                                 <span class="" id="Select_date">Jan 11</span>
                                 <i data-feather="calendar" class="align-self-center icon-xs ml-1"></i>
                             </a>
-                            <a href="#" class="btn btn-sm btn-outline-primary">
-                                <i data-feather="download" class="align-self-center icon-xs"></i>
-                            </a>
                         </div><!--end col-->
                     </div><!--end row-->
                 </div><!--end page-title-box-->
@@ -59,7 +56,7 @@
                                 <p class="text-dark mb-1 font-weight-semibold">Number of Clients</p>
                                 <h3 class="my-2">{{ $clients }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
-                                            class="mdi mdi-trending-up"></i>8.5%</span> </p>
+                                            class="mdi mdi-trending-up"></i></span> Clients</p>
                             </div>
                             <div class="col-auto align-self-center">
                                 <div class="report-main-icon bg-light-alt">
@@ -78,7 +75,7 @@
                                 <p class="text-dark mb-1 font-weight-semibold">Total Projects</p>
                                 <h3 class="my-2">{{ $projects }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
-                                            class="mdi mdi-trending-up"></i>1.5%</span> Weekly Avg.Sessions</p>
+                                            class="mdi mdi-trending-up"></i></span> Total Projects</p>
                             </div>
                             <div class="col-auto align-self-center">
                                 <div class="report-main-icon bg-light-alt">
@@ -97,7 +94,7 @@
                                 <p class="text-dark mb-1 font-weight-semibold">Current Projects</p>
                                 <h3 class="my-2">{{ $currentProjects }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-danger"><i
-                                            class="mdi mdi-trending-down"></i>35%</span> Bounce Rate Weekly</p>
+                                            class="mdi mdi-trending-down"></i></span> Current Projects</p>
                             </div>
                             <div class="col-auto align-self-center">
                                 <div class="report-main-icon bg-light-alt">
@@ -113,10 +110,10 @@
                     <div class="card-body">
                         <div class="row d-flex justify-content-center">
                             <div class="col">
-                                <p class="text-dark mb-1 font-weight-semibold">Month Completed Projects</p>
+                                <p class="text-dark mb-1 font-weight-semibold">Completed Project</p>
                                 <h3 class="my-2">{{ $monthCompletedProjects }}</h3>
-                                {{-- <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
-                                            class="mdi mdi-trending-up"></i>10.5%</span> Completions Weekly</p> --}}
+                                <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
+                                            class="mdi mdi-trending-up"></i></span> Completions </p>
                             </div>
                             <div class="col-auto align-self-center">
                                 <div class="report-main-icon bg-light-alt">
@@ -137,9 +134,9 @@
                         <div class="row d-flex justify-content-center">
                             <div class="col">
                                 <p class="text-dark mb-1 font-weight-semibold">Total Income</p>
-                                <h3 class="my-2">{{ $totalIncome }}</h3>
+                                <h3 class="my-2">${{ $totalIncome }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
-                                            class="mdi mdi-trending-up"></i>8.5%</span> </p>
+                                            class="mdi mdi-trending-up"></i></span>Total Income </p>
                             </div>
                             <div class="col-auto align-self-center">
                                 <div class="report-main-icon bg-light-alt">
@@ -156,9 +153,9 @@
                         <div class="row d-flex justify-content-center">
                             <div class="col">
                                 <p class="text-dark mb-1 font-weight-semibold">Monthly Expense</p>
-                                <h3 class="my-2">{{ $monthExpense }}</h3>
+                                <h3 class="my-2">${{ $monthExpense }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
-                                            class="mdi mdi-trending-up"></i>1.5%</span> Weekly Avg.Sessions</p>
+                                            class="mdi mdi-trending-up"></i></span>Monthly Expense</p>
                             </div>
                             <div class="col-auto align-self-center">
                                 <div class="report-main-icon bg-light-alt">
@@ -175,9 +172,9 @@
                         <div class="row d-flex justify-content-center">
                             <div class="col">
                                 <p class="text-dark mb-1 font-weight-semibold">Monthly Profit</p>
-                                <h3 class="my-2">{{ $monthProfit }}</h3>
+                                <h3 class="my-2">${{ $monthProfit }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-danger"><i
-                                            class="mdi mdi-trending-down"></i>35%</span> Bounce Rate Weekly</p>
+                                            class="mdi mdi-trending-down"></i></span> Monthly Profit</p>
                             </div>
                             <div class="col-auto align-self-center">
                                 <div class="report-main-icon bg-light-alt">
@@ -276,7 +273,7 @@
             <!--end col-->
         </div><!--end row-->
         <div class="row">
-             <div class="col-lg-4">
+            <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header">
                         <div class="row align-items-center">
@@ -310,7 +307,7 @@
                     </div><!--end card-body-->
                 </div><!--end card-body-->
             </div> <!--end col-->
-           
+
         </div><!--end row-->
 
         {{-- <div class="row">
@@ -534,7 +531,7 @@
             const income = @json(array_column($monthlyData, 'income'));
             const expense = @json(array_column($monthlyData, 'expense'));
             const profit = @json(array_column($monthlyData, 'profit'));
-
+            console.log(months, income, expense, profit);
             var options = {
                 chart: {
                     height: 400,

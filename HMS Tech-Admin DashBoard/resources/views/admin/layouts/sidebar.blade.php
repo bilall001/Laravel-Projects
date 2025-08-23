@@ -172,57 +172,36 @@
 
                         {{-- =========================== TEAM MANAGER =========================== --}}
                     @elseif(auth()->user()->role === 'team manager')
-                    <li>
-                    <a href="{{ route('teamManager.dashboard') }}">
-                        <i class="mdi mdi-view-dashboard-outline" style="font-size: 18px;"></i> Dashboard
-                    </a>
-                </li>
-                        <li><a href="{{ route('add-users.index') }}">
-                                <i class="mdi mdi-account-multiple-outline" style="font-size: 18px;"></i> Users
-                            </a></li>
-
-                        <li><a href="{{ route('developers.index') }}">
-                                <i class="mdi mdi-code-braces" style="font-size: 18px;"></i> Developers
-                            </a></li>
-
-                        <li><a href="{{ route('clients.index') }}">
-                                <i class="mdi mdi-account-tie-outline" style="font-size: 18px;"></i> Clients
-                            </a></li>
-
-                        <li><a href="{{ route('companyExpense.index') }}">
-                                <i class="mdi mdi-cash-multiple" style="font-size: 18px;"></i> Company Expense
-                            </a></li>
-
-                        <li><a href="{{ route('attendances.index') }}">
-                                <i class="mdi mdi-calendar-check-outline" style="font-size: 18px;"></i> Attendance
-                            </a></li>
+                        <li>
+                            <a href="{{ route('teamManager.dashboard') }}">
+                                <i class="mdi mdi-view-dashboard-outline" style="font-size: 18px;"></i> Dashboard
+                            </a>
+                        </li>
 
                         <li><a href="{{ route('admin.teams.index') }}">
                                 <i class="mdi mdi-account-group-outline" style="font-size: 18px;"></i> Manage Teams
                             </a></li>
-
-                        <li><a href="{{ route('admin.projects.index') }}">
-                                <i class="mdi mdi-briefcase-outline" style="font-size: 18px;"></i> Manage Projects
-                            </a></li>
-
                         <li><a href="{{ route('admin.tasks.index') }}">
                                 <i class="mdi mdi-clipboard-check-outline" style="font-size: 18px;"></i> Manage Tasks
                             </a></li>
 
                         <li><a href="{{ route('projectSchedule.index') }}">
-                                <i class="mdi mdi-calendar-clock-outline" style="font-size: 18px;"></i> Project Schedule
+                                <i class="mdi mdi-calendar-clock" style="font-size: 18px;"></i> Project Schedule
                             </a></li>
-
-                        <li><a href="{{ route('developer.points') }}">
-                                <i class="mdi mdi-star-outline" style="font-size: 18px;"></i> Developer Points
-                            </a></li>
-
-                        <li><a href="{{ route('admin.salaries.index') }}">
-                                <i class="mdi mdi-currency-usd" style="font-size: 18px;"></i> Manage Salaries
-                            </a></li>
-
                         {{-- =========================== BUSINESS DEVELOPER =========================== --}}
                     @elseif(auth()->user()->role === 'business developer')
+                        <li>
+                            <a href="{{ route('business-developer.dashboard') }}">
+                                <i class="mdi mdi-view-dashboard-outline" style="font-size: 18px;"></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('projectSchedule.index') }}">
+                                <i class="mdi mdi-calendar-clock"
+                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
+                                Project Schedule
+                            </a>
+                        </li>
                         {{-- =========================== DEVELOPER =========================== --}}
                     @elseif(auth()->user()->role === 'developer')
                         <li>
@@ -239,7 +218,7 @@
                     @if (auth()->check() && auth()->user()->role === 'client')
                         <li>
                             <a href="{{ route('client.dashboard') }}">
-                                <i class="mdi mdi-briefcase-account-outline" style="font-size: 18px;"></i> My Projects
+                                <i class="mdi mdi-briefcase-account-outline" style="font-size: 18px;"></i> Dashboard
                             </a>
                         </li>
                     @endif

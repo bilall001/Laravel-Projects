@@ -31,7 +31,7 @@ class AuthController extends Controller
 
             // Redirect based on role
             if ($user->role === 'admin') {
-                return redirect()->route('admin.index'); // Admin sees developers list
+                return redirect()->route('admin.dashboard'); // Admin sees developers list
             } elseif ($user->role === 'developer') {
                 return redirect()->route('developers.index'); // Developer sees own dashboard
             } elseif ($user->role === 'client') {
@@ -42,7 +42,9 @@ class AuthController extends Controller
             }
              elseif ($user->role === 'partner') {
                 return redirect()->route('admin.index'); // Client sees their dashboard
-            }
+            }elseif ($user->role === 'business developer') {
+    return redirect()->route('business-developer.dashboard'); // ✅ new redirect
+}
 
 
             // Unknown role

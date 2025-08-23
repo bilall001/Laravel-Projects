@@ -9,5 +9,11 @@ class ProjectSchedule extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'date', 'status'];
+    protected $fillable = ['project_id', 'date', 'status'];
+
+    // Define relationship to Project
+    public function project()
+    {
+        return $this->belongsTo(Project::class,'project_id');
+    }
 }

@@ -1,200 +1,248 @@
 @extends('admin.layouts.main')
 
 @section('content')
+    @if (Auth::user()->role === 'developer')
+        <div class="container-fluid py-4">
 
-@if(Auth::user()->role === 'developer')
-<div class="container-fluid py-4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="page-title-box">
+                        <div class="row">
+                            <div class="col">
+                                <h4 class="page-title">Analytics</h4>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item active">Dashboard</li>
+                                </ol>
+                            </div><!--end col-->
+                            <div class="col-auto align-self-center">
+                                <a href="#" class="btn btn-sm btn-outline-primary" id="Dash_Date">
+                                    <span class="ay-name" id="Day_Name">Today:</span>&nbsp;
+                                    <span class="" id="Select_date">Jan 11</span>
+                                    <i data-feather="calendar" class="align-self-center icon-xs ml-1"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                    <i data-feather="download" class="align-self-center icon-xs"></i>
+                                </a>
+                            </div><!--end col-->
+                        </div><!--end row-->
+                    </div><!--end page-title-box-->
+                </div><!--end col-->
+            </div><!--end row-->
+            <!-- end page title end breadcrumb -->
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card report-card">
+                        <div class="card-body">
+                            <div class="row d-flex justify-content-center">
+                                <div class="col">
+                                    <p class="text-dark mb-1 font-weight-semibold">📊 Individual Projects Assigned</p>
+                                    <h3 class="my-2">{{ $directProjectsCount }}</h3>
+                                    <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
+                                                class="mdi mdi-trending-up"></i>8.5%</span> </p>
+                                </div>
+                                <div class="col-auto align-self-center">
+                                    <div class="report-main-icon bg-light-alt">
+                                        <i data-feather="users" class="align-self-center text-muted icon-md"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--end card-body-->
+                    </div><!--end card-->
+                </div> <!--end col-->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card report-card">
+                        <div class="card-body">
+                            <div class="row d-flex justify-content-center">
+                                <div class="col">
+                                    <p class="text-dark mb-1 font-weight-semibold">🚧 Team Projects Assigned</p>
+                                    <h3 class="my-2">{{ $teamProjectsCount }}</h3>
+                                    <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
+                                                class="mdi mdi-trending-up"></i>1.5%</span> Weekly Avg.Sessions</p>
+                                </div>
+                                <div class="col-auto align-self-center">
+                                    <div class="report-main-icon bg-light-alt">
+                                        <i data-feather="clock" class="align-self-center text-muted icon-md"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--end card-body-->
+                    </div><!--end card-->
+                </div> <!--end col-->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card report-card">
+                        <div class="card-body">
+                            <div class="row d-flex justify-content-center">
+                                <div class="col">
+                                    <p class="text-dark mb-1 font-weight-semibold">✅Total Teams Part In</p>
+                                    <h3 class="my-2">{{ $teamCount }}</h3>
+                                    <p class="mb-0 text-truncate text-muted"><span class="text-danger"><i
+                                                class="mdi mdi-trending-down"></i>35%</span> Bounce Rate Weekly</p>
+                                </div>
+                                <div class="col-auto align-self-center">
+                                    <div class="report-main-icon bg-light-alt">
+                                        <i data-feather="activity" class="align-self-center text-muted icon-md"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--end card-body-->
+                    </div><!--end card-->
+                </div> <!--end col-->
+            </div><!--end row-->
 
-    {{-- 🔹 Welcome --}}
-    <h3 class="fw-bold mb-4 text-primary">
-        <i class="bi bi-speedometer2 me-2"></i> Developer Dashboard
-    </h3>
+            {{-- 🔹 My Projects --}}
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white fw-semibold">
+                    <i class="bi bi-kanban me-2"></i> My Projects
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Team</th>
+                                <th>Assigned By</th>
+                                <th>Start Date</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($allProjects as $project)
+                                <tr>
+                                    <td>{{ $project->title }}</td>
+                                    <td>{{ Str::limit($project->description, 40) ?? '-' }}</td>
+                                    <td>{{ ucfirst($project->type) }}</td>
+                                    <td>{{ $project->team?->name ?? '-' }}</td>
+                                    <td>{{ $project->businessDeveloper?->name ?? '-' }}</td>
+                                    <td>{{ $project->start_date ?? '-' }}</td>
+                                    <td>{{ $project->developer_end_date ?? '-' }}</td>
+                                    <td>
+                                        @php
+                                            $latestSchedule = $project->schedules->sortByDesc('id')->first();
+                                            $projectStatus = $latestSchedule ? $latestSchedule->status : '-';
+                                        @endphp
+                                        <span
+                                            class="badge 
+        {{ $projectStatus === 'completed'
+            ? 'bg-success'
+            : ($projectStatus === 'inprogress'
+                ? 'bg-warning'
+                : 'bg-secondary') }}">
+                                            {{ ucfirst($projectStatus) }}
+                                        </span>
+                                    </td>
 
-    {{-- 🔹 Quick Stats --}}
-    <div class="row g-3 mb-4">
-        <div class="col-md-3 col-6">
-            <div class="card shadow-sm border-0 text-center">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Assigned Projects</h6>
-                    <h4 class="fw-bold">{{ $projects->count() }}</h4>
+                                    <td>
+                                        <span class="badge bg-info">{{ $project->assignment_type }}</span>
+                                    </td>
+
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">No projects assigned yet.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-        {{-- <div class="col-md-3 col-6">
-            <div class="card shadow-sm border-0 text-center">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Completed Projects</h6>
-                    <h4 class="fw-bold text-success">
-                        {{ $projects->where('status', 'completed')->count() + $completedSchedules->count() }}
-                    </h4>
-                </div>
-            </div>
-        </div> --}}
-        <div class="col-md-3 col-6">
-            <div class="card shadow-sm border-0 text-center">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Total Teams</h6>
-                    <h4 class="fw-bold text-info">{{ $teams->count() }}</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6">
-            <div class="card shadow-sm border-0 text-center">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Pending Salary</h6>
-                    <h4 class="fw-bold text-danger">
-                        ${{ number_format($salary->where('is_paid', false)->sum('amount'), 2) }}
-                    </h4>
-                </div>
-            </div>
-        </div>
+
+            <div class="card shadow mb-4">
+    <div class="card-header bg-dark text-white fw-semibold">
+        <i class="bi bi-people-fill me-2"></i> My Teams
     </div>
-
-    {{-- 🔹 Assigned Projects --}}
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-primary text-white fw-semibold">
-            <i class="bi bi-kanban me-2"></i> Your Projects
-        </div>
-       <div class="card-body">
-    <h5 class="mb-3">Active Projects</h5>
-
-    @forelse($projects as $project)
-        <div class="p-3 mb-3 rounded border position-relative {{ $project->type === 'team' ? 'bg-light' : 'bg-white' }}">
-            <h5 class="fw-bold mb-1">
-                {{ $project->title }}
-                @if($project->type === 'team')
-                    <span class="badge bg-info">Team</span>
-                @endif
-            </h5>
-            <p class="mb-1 text-muted">{{ $project->description }}</p>
-            <small class="d-block mb-1">
-                <strong>Developer Deadline:</strong> {{ $project->developer_end_date }}
-            </small>
-            <small class="d-block mb-2">
-                <strong>Status:</strong> {{ ucfirst($project->status) }}
-            </small>
-
-            {{-- <form action="{{ route('developer.projects.updateStatus', $project->id) }}" method="POST" class="mt-2">
-                @csrf
-                <select name="status" class="form-select form-select-sm d-inline-block w-auto">
-                    <option value="pending" {{ $project->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="in_progress" {{ $project->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                    <option value="completed" {{ $project->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                </select>
-                <button class="btn btn-primary btn-sm">
-                    Update
-                </button>
-            </form> --}}
-        </div>
-    @empty
-        <p class="text-muted">No active projects assigned to you.</p>
-    @endforelse
+    <div class="card-body table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Team Name</th>
+                    <th>Other Developers</th>
+                    <th>Total Members</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($teams as $team)
+                    <tr>
+                        <td>{{ $team->name }}</td>
+                        <td>
+                            @forelse($team->users as $user)
+                                <span class="badge bg-info text-dark">{{ $user->name }}</span>
+                            @empty
+                                <span class="text-muted">No other developers</span>
+                            @endforelse
+                        </td>
+                        <td>{{ $team->users->count() + 1 }}</td> {{-- +1 for current developer --}}
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">You are not part of any team.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 
-    </div>
+            <div class="row">
 
-    {{-- 🔹 Completed Projects from Schedule --}}
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-success text-white fw-semibold">
-            <i class="bi bi-check2-circle me-2"></i> Completed Projects from Schedule
-        </div>
-        {{-- <div class="card-body">
-            @forelse($completedSchedules as $schedule)
-                <div class="p-3 mb-3 rounded border bg-light">
-                    <h5 class="fw-bold mb-1">{{ $schedule->name ?? 'Untitled Project' }}</h5>
-                    <p class="mb-1 text-muted">{{ $schedule->description ?? 'No description available' }}</p>
-                    <small class="d-block mb-1">
-                        <strong>Completed On:</strong>
-                        {{ \Carbon\Carbon::parse($schedule->completed_at ?? $schedule->updated_at)->format('M d, Y') }}
-                    </small>
-                </div>
-            @empty
-                <p class="text-muted">No completed schedules found.</p>
-            @endforelse
-        </div> --}}
-    </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white">
+                            📊 Attendance Progress ({{ now()->format('F Y') }})
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Total Days:</strong> {{ $totalDays }}</p>
+                            <p><strong>Present:</strong> ✅ {{ $presentDays }}</p>
+                            <p><strong>Absent:</strong> ❌ {{ $absentDays }}</p>
+                            <p><strong>Leave:</strong> 🏖️ {{ $leaveDays }}</p>
 
-    {{-- 🔹 Your Teams --}}
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-dark text-white fw-semibold">
-            <i class="bi bi-people-fill me-2"></i> Your Teams
-        </div>
-        <div class="card-body">
-            @forelse($teams as $team)
-                <div class="mb-3">
-                    <strong>{{ $team->name }}</strong>
-                    <div class="mt-1">
-                        @foreach($team->users as $user)
-                            <span class="badge bg-info text-dark">{{ $user->name }}</span>
-                        @endforeach
+                            <div class="progress mt-3" style="height: 20px;">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                    style="width: {{ $attendancePercentage }}%;"
+                                    aria-valuenow="{{ $attendancePercentage }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ $attendancePercentage }}%
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            @empty
-                <p class="text-muted">You are not part of any team.</p>
-            @endforelse
-        </div>
-    </div>
 
-
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-success text-white fw-semibold d-flex align-items-center">
-            <i class="bi bi-cash-coin me-2 fs-5"></i> Salary / Payments
-        </div>
-        <div class="card-body">
-            @forelse($salary as $s)
-                <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
-                    <div>
-                        <strong class="text-primary">
-                            {{ \Carbon\Carbon::parse($s->salary_date)->format('M d, Y') }}
-                        </strong>
-                        <span class="mx-2">|</span>
-                        <span class="fw-bold text-success">
-                            ${{ number_format($s->amount, 2) }}
-                        </span>
-                        <span class="mx-2">|</span>
-                        <span class="text-muted">
-                            {{ ucfirst($s->payment_method) }}
-                        </span>
-                    </div>
-                    <div>
-                        @if($s->is_paid)
-                            <span class="badge bg-success px-3 py-2">Paid</span>
-                        @else
-                            <span class="badge bg-danger px-3 py-2">Unpaid</span>
-                        @endif
+                {{-- Salary --}}
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-info text-white">💰 Salary Info</div>
+                        <div class="card-body table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Amount</th>
+                                        <th>Date Paid</th>
+                                        <th>Method</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($salaries as $salary)
+                                        <tr>
+                                            <td>{{ \Carbon\Carbon::parse($salary->salary_date)->format('F Y') }}</td>
+                                            <td>Rs. {{ number_format($salary->amount, 2) }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($salary->salary_date)->format('d M, Y') }}</td>
+                                            <td>{{ ucfirst($salary->payment_method) }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center">No Paid Salaries Found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            @empty
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-wallet2 fs-3 d-block mb-2"></i>
-                    No salary records found.
-                </div>
-            @endforelse
+            </div>
+
         </div>
-    </div>
-
-
-
-    {{-- 🔹 Attendance --}}
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-warning text-dark fw-semibold">
-            <i class="bi bi-calendar-check me-2"></i> Attendance
-        </div>
-        <div class="card-body">
-            @forelse($attendance as $att)
-                <div class="border-bottom py-2">
-                    {{ $att->date }} -
-                    <span class="{{ $att->status === 'present' ? 'text-success' : ($att->status === 'leave' ? 'text-warning' : 'text-danger') }}">
-                        {{ ucfirst($att->status) }}
-                    </span>
-                </div>
-            @empty
-                <p class="text-muted">No attendance records available.</p>
-            @endforelse
-        </div>
-    </div>
-
-</div>
-@endif
-
+    @endif
 @endsection

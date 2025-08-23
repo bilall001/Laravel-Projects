@@ -1,7 +1,5 @@
 @extends('admin.layouts.main')
-@section('title')
-    Projects - HMS Tech & Solutions
-@endsection
+
 @section('content')
     <div class="container-fluid">
         <div class="row mb-3">
@@ -18,10 +16,10 @@
         @endif
 
         <div class="card">
-            <div class="card-header">All Projects</div>
+            <div class="card-header text-white" style="background-color: #1D2C48">All Projects</div>
             <div class="card-body table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="thead-dark">
+                <table class="table table-hover mb-0">
+                    <thead class="table-primary">
                         <tr>
                             <th>Title</th>
                             <th>File</th>
@@ -65,7 +63,7 @@
                                 <td>{{ $project->developer_end_date }}</td>
                                 <td>
                                     <div class="d-flex align-items-center gap-1">
-                                        <a href="{{ route('admin.projects.show', $project->id) }}"
+                                        <a href="{{ route('admin.projects.index', ['show_id' => $project->id]) }}"
                                             class="btn btn-sm btn-light" title="View">
                                             <i class="fas fa-eye text-primary"></i>
                                         </a>
@@ -95,9 +93,9 @@
         </div>
     </div>
 
-    {{-- Add/Edit Modal moved OUTSIDE the card --}}
+    {{-- Add/Edit Modal (Bootstrap modal style) --}}
     @if ($showModal)
-        <div class="modal show d-block" tabindex="-1" role="dialog"
+        <div class="modal fade show d-block" id="projectModal" tabindex="-1" role="dialog"
             style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
             <div class="modal-dialog modal-lg">
                 <form method="POST"
@@ -110,7 +108,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{{ $editProject ? 'Edit Project' : 'Add Project' }}</h5>
-                            <a href="{{ route('admin.projects.index') }}" class="close">&times;</a>
+                            <button type="button" class="btn-close" id="closeProjectModalBtn" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
                             @if ($errors->any())
@@ -271,18 +269,101 @@
                             </div>
 
 
-                            <div class="modal-footer">
-                                <button type="submit"
-                                    class="btn btn-success">{{ $editProject ? 'Update' : 'Create' }}</button>
-                                <a href="{{ route('admin.projects.index') }}" class="btn btn-secondary">Cancel</a>
-                            </div>
+                            {{-- <div class="mb-3" id="businessDeveloperSelect" style="display: none;">
+                                <label for="business_developer_id" class="form-label">Business Developer</label>
+                                <select name="business_developer_id" id="business_developer_id" class="form-control">
+                                    <option value="">Select Business Developer</option>
+                                    @foreach ($businessDevelopers as $bd)
+                                        <option value="{{ $bd->id }}"
+                                            {{ isset($editProject) && $editProject->business_developer_id == $bd->id ? 'selected' : '' }}>
+                                            {{ $bd->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div> --}}
                         </div>
+
+                        <div class="modal-footer">
+                            <button type="submit"
+                                class="btn btn-success">{{ $editProject ? 'Update' : 'Create' }}</button>
+                            <button type="button" class="btn btn-secondary" id="cancelProjectModalBtn">Cancel</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
     @endif
+    @if ($showProject)
+        <div class="modal fade show d-block" id="projectShowModal" tabindex="-1" role="dialog"
+            style="background-color: rgba(0,0,0,0.6); z-index: 1050;">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content shadow-lg border-0 rounded-3">
+                    <div class="modal-header bg-primary text-white rounded-top">
+                        <h5 class="modal-title fw-bold">📂 Project Details</h5>
+                        <button type="button" class="btn-close btn-close-white" id="closeShowProjectModalBtn"></button>
+                    </div>
+                    <div class="modal-body p-4" style="font-family: 'Poppins', sans-serif;">
 
-    {{-- Scripts --}}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>📌 Title:</strong> {{ $showProject->title }}</p>
+                                @if ($showProject->type === 'individual' && $showProject->user_id)
+                                    <p><strong>👨‍💻 Developer:</strong> {{ $showProject->user->name }}</p>
+                                @elseif ($showProject->type === 'team' && $showProject->team_id)
+                                    <p><strong>👥 Team:</strong> {{ $showProject->team->name }}</p>
+                                @else
+                                    <p><strong>👥/👨‍💻 Assigned To:</strong> N/A</p>
+                                @endif
+                                <p><strong>👥 Duration:</strong> {{ $showProject->duration ?? '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>💲 Total Price:</strong> ${{ number_format($showProject->price, 2) }}</p>
+                                <p><strong>✅ Paid:</strong> ${{ number_format($showProject->paid_price, 2) }}</p>
+                                <p><strong>💰 Remaining:</strong>
+                                    @if ($showProject->remaining_price >= 0)
+                                        ${{ number_format($showProject->remaining_price, 2) }}
+                                    @else
+                                        <span class="badge bg-danger">Overpaid</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>📅 Start Date:</strong> {{ $showProject->start_date }}</p>
+                                <p><strong>📅 End Date:</strong> {{ $showProject->end_date }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>🛠 Developer End Date:</strong> {{ $showProject->developer_end_date }}</p>
+                                @if ($showProject->business_developer_id)
+                                    <p><strong>📥 Project Get By:</strong> {{ $showProject->businessDeveloper->name }}
+                                    </p>
+                                @else
+                                    <p><strong>📥 Project Get By:</strong> Admin</p>
+                                @endif
+                            </div>
+                        </div>
+                        @if ($showProject->file)
+                            <p><strong>📎 File:</strong>
+                                <a href="{{ asset('storage/' . $showProject->file) }}" target="_blank"
+                                    class="btn btn-outline-primary btn-sm">
+                                    View File
+                                </a>
+                            </p>
+                        @endif
+                    </div>
+                    <div class="modal-footer bg-light rounded-bottom">
+                        <button type="button" class="btn btn-secondary px-4"
+                            id="cancelShowProjectModalBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const adminRadio = document.getElementById('getByAdmin');
@@ -304,29 +385,49 @@
                 bdRadio.addEventListener('change', toggleBDSelect);
                 toggleBDSelect();
             }
-        });
 
-        function calculateRemaining() {
-            const total = parseFloat(document.querySelector('[name="price"]').value) || 0;
-            const paid = parseFloat(document.querySelector('[name="paid_price"]').value) || 0;
-            const remaining = Math.max(total - paid, 0);
-            document.getElementById('remaining-display').innerText = '$' + remaining.toFixed(2);
-        }
+            // ✅ Handle ALL modal close buttons here
+            [
+                'closeProjectModalBtn',
+                'cancelProjectModalBtn',
+                'closeShowProjectModalBtn',
+                'cancelShowProjectModalBtn'
+            ].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        window.location.href = "{{ route('admin.projects.index') }}";
+                    });
+                }
+            });
 
-        document.querySelector('[name="price"]').addEventListener('input', calculateRemaining);
-        document.querySelector('[name="paid_price"]').addEventListener('input', calculateRemaining);
+            function calculateRemaining() {
+                const total = parseFloat(document.querySelector('[name="price"]')?.value) || 0;
+                const paid = parseFloat(document.querySelector('[name="paid_price"]')?.value) || 0;
+                const remaining = Math.max(total - paid, 0);
+                if (document.getElementById('remaining-display')) {
+                    document.getElementById('remaining-display').innerText = '$' + remaining.toFixed(2);
+                }
+            }
 
-        function toggleFields() {
-            const type = document.getElementById('type')?.value;
-            document.getElementById('team-group').style.display = (type === 'team') ? 'block' : 'none';
-            document.getElementById('user-group').style.display = (type === 'individual') ? 'block' : 'none';
-        }
+            document.querySelector('[name="price"]')?.addEventListener('input', calculateRemaining);
+            document.querySelector('[name="paid_price"]')?.addEventListener('input', calculateRemaining);
 
-        window.onload = function() {
+            function toggleFields() {
+                const type = document.getElementById('type')?.value;
+                if (document.getElementById('team-group')) {
+                    document.getElementById('team-group').style.display = (type === 'team') ? 'block' : 'none';
+                }
+                if (document.getElementById('user-group')) {
+                    document.getElementById('user-group').style.display = (type === 'individual') ? 'block' :
+                        'none';
+                }
+            }
+
             toggleFields();
             calculateRemaining();
-        };
-
-        document.getElementById('type')?.addEventListener('change', toggleFields);
+            document.getElementById('type')?.addEventListener('change', toggleFields);
+        });
     </script>
+
 @endsection

@@ -14,7 +14,7 @@ class Task extends Model
     }
 
     public function user() {
-        return $this->belongsTo(AddUser::class,'user_id');
+        return $this->belongsTo(AddUser::class);
     }
 
     public function team() {

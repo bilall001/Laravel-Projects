@@ -20,11 +20,14 @@ class AdminController extends Controller
         // Existing logic
         $clients = Client::count();
         $projects = Project::count();
-        $currentProjects = ProjectSchedule::where('status', 'deliver')->count();
-        $monthCompletedProjects = ProjectSchedule::where('status', 'complete')
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->count();
+         $currentProjects = Project::whereHas('schedules', function ($query) {
+            $query->where('status', 'inProgress');
+        })->count();
+
+        // Count completed projects (status = completed)
+        $monthCompletedProjects = Project::whereHas('schedules', function ($query) {
+            $query->where('status', 'completed');
+        })->count();
         $data001 = [
             'developers' => Developer::all()->count(),
             'clients'    => Client::all()->count(),

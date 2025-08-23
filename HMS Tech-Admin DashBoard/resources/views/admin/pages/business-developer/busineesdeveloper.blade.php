@@ -18,10 +18,10 @@
 
     {{-- Developers Table --}}
     <div class="card">
-        <div class="card-header bg-dark text-white">Business Developer List</div>
+        <div class="card-header text-white" style="background-color: #1D2C48">All Business Developers</div>
         <div class="card-body table-responsive">
-            <table class="table table-bordered align-middle">
-                <thead class="table-light">
+            <table class="table table-hover mb-0">
+                <thead class="table-primary">
                     <tr>
                         <th>Name</th>
                         <th>Phone</th>
@@ -80,13 +80,13 @@
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="bizDevModalTitle">Add Business Developer</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close btn-close-white close-bizdev-modal"></button>
                     </div>
                     <div class="modal-body row g-3">
                         <div class="col-md-6">
-                            <label>Select BusinessDeveloper</label>
+                            <label>Select User</label>
                             <select name="add_user_id" class="form-select" required>
-                                <option value="">-- Select BusinessDeveloper --</option>
+                                <option value="">-- Select User --</option>
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->username }})</option>
                                 @endforeach
@@ -129,7 +129,7 @@
 
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success">Save Business Developer</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary close-bizdev-modal">Cancel</button>
                     </div>
                 </div>
             </form>
@@ -142,7 +142,7 @@
             <div class="modal-content p-3">
                 <div class="modal-header bg-info text-white">
                     <h5 class="modal-title">Business Developer Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white close-view-modal"></button>
                 </div>
                 <div class="modal-body" id="viewBizDevContent"></div>
             </div>
@@ -153,11 +153,15 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const bizDevModal = new bootstrap.Modal(document.getElementById('bizDevModal'));
-    const viewBizModal = new bootstrap.Modal(document.getElementById('viewBizDevModal'));
+    const bizDevModalEl = document.getElementById('bizDevModal');
+    const viewBizModalEl = document.getElementById('viewBizDevModal');
+    const bizDevModal = new bootstrap.Modal(bizDevModalEl);
+    const viewBizModal = new bootstrap.Modal(viewBizModalEl);
+
     const form = document.getElementById('bizDevForm');
     const formMethod = document.getElementById('bizDevFormMethod');
 
+    // Open create form
     document.getElementById('createBizDevBtn').addEventListener('click', () => {
         form.reset();
         formMethod.value = 'POST';
@@ -166,6 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
         bizDevModal.show();
     });
 
+    // Edit form
     document.querySelectorAll('.edit-bizdev-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const dev = JSON.parse(btn.dataset.dev);
@@ -181,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // View modal
     document.querySelectorAll('.view-bizdev-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const dev = JSON.parse(btn.dataset.dev);
@@ -196,6 +202,15 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('viewBizDevContent').innerHTML = html;
             viewBizModal.show();
         });
+    });
+
+    // Close modals via ❌ or Cancel
+    document.querySelectorAll('.close-bizdev-modal').forEach(btn => {
+        btn.addEventListener('click', () => bizDevModal.hide());
+    });
+
+    document.querySelectorAll('.close-view-modal').forEach(btn => {
+        btn.addEventListener('click', () => viewBizModal.hide());
     });
 });
 </script>
