@@ -1,6 +1,6 @@
 @extends('admin.layouts.main')
 @section('title')
-All Users - HMS Tech & Solutions
+All Users - HMS Tech  & Solutions
 @endsection
 @section('content')
 <div class="container-fluid">
@@ -32,7 +32,7 @@ All Users - HMS Tech & Solutions
 
     {{-- Users Table --}}
     <div class="card">
-        <div class="card-header text-white" style="background-color: #1D2C48">User List</div>
+        <div class="card-header text-white" style="background-color: rgb(2, 2, 100)">User List</div>
         <div class="card-body table-responsive">
             <table class="table table-hover mb-0">
                 <thead class="table-primary">
@@ -50,50 +50,74 @@ All Users - HMS Tech & Solutions
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->email }}</td>
-                            <td><span class="badge bg-success">{{ ucfirst($user->role) }}</span></td>
+                            <td>
+    @switch($user->role)
+        @case('admin')
+            <span class="badge bg-primary">{{ ucfirst($user->role) }}</span>
+            @break
+        @case('business developer')
+            <span class="badge bg-success">{{ ucfirst($user->role) }}</span>
+            @break
+        @case('client')
+            <span class="badge bg-secondary">{{ ucfirst($user->role) }}</span>
+            @break
+        @case('partner')
+            <span class="badge bg-warning text-dark">{{ ucfirst($user->role) }}</span>
+            @break
+        @case('team manager')
+            <span class="badge bg-info">{{ ucfirst($user->role) }}</span>
+            @break
+        @case('developer')
+            <span class="badge bg-success">{{ ucfirst($user->role) }}</span>
+            @break
+        @default
+            <span class="badge bg-light text-dark">{{ ucfirst($user->role) }}</span>
+    @endswitch
+</td>
 
-                            <td class="text-start">
-                                {{-- View --}}
-                                <button 
-                                    class="btn btn-sm btn-outline-info me-1 view-user-btn" 
-                                    data-name="{{ $user->name }}"
-                                    data-username="{{ $user->username }}"
-                                    data-email="{{ $user->email }}"
-                                    data-role="{{ ucfirst($user->role) }}"
-                                    title="View"
-                                >
-                                    <i class="fas fa-eye"></i>
-                                </button>
-
-                                {{-- Edit --}}
-                                @if(auth()->user()->role === 'admin')
+                            <td>
+                                <div class="d-flex align-items-center gap-1">
+                                    {{-- View --}}
                                     <button 
-                                        class="btn btn-sm btn-outline-primary me-1 edit-user-btn"
-                                        data-id="{{ $user->id }}"
-                                        data-url="{{ route('add-users.update', $user->id) }}"
+                                        class="btn btn-sm btn-light view-user-btn" 
                                         data-name="{{ $user->name }}"
                                         data-username="{{ $user->username }}"
                                         data-email="{{ $user->email }}"
-                                        data-role="{{ $user->role }}"
-                                        title="Edit"
+                                        data-role="{{ ucfirst($user->role) }}"
+                                        title="View"
                                     >
-                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye text-primary"></i>
                                     </button>
 
-                                    {{-- Delete --}}
-                                    <form 
-                                        action="{{ route('add-users.destroy', $user->id) }}" 
-                                        method="POST" 
-                                        class="d-inline" 
-                                        onsubmit="return confirm('Are you sure?')"
-                                    >
-                                        @csrf 
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                            <i class="fas fa-trash"></i>
+                                    {{-- Edit + Delete --}}
+                                    @if(auth()->user()->role === 'admin')
+                                        <button 
+                                            class="btn btn-sm btn-light edit-user-btn"
+                                            data-id="{{ $user->id }}"
+                                            data-url="{{ route('add-users.update', $user->id) }}"
+                                            data-name="{{ $user->name }}"
+                                            data-username="{{ $user->username }}"
+                                            data-email="{{ $user->email }}"
+                                            data-role="{{ $user->role }}"
+                                            title="Edit"
+                                        >
+                                            <i class="fas fa-edit text-info"></i>
                                         </button>
-                                    </form>
-                                @endif
+
+                                        <form 
+                                            action="{{ route('add-users.destroy', $user->id) }}" 
+                                            method="POST" 
+                                            class="d-inline" 
+                                            onsubmit="return confirm('Are you sure?')"
+                                        >
+                                            @csrf 
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-light" title="Delete">
+                                                <i class="fas fa-trash text-danger"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -108,16 +132,16 @@ All Users - HMS Tech & Solutions
 </div>
 
 {{-- Modal: Create/Edit User --}}
-<div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form method="POST" id="userForm" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
             <input type="hidden" name="user_id" id="userId">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title">Add User</h5>
-                    <button type="button" id="userCloseBtn" class="btn btn-sm" aria-label="Close">
+                    <button type="button" id="closeModalBtn" class="btn btn-sm" aria-label="Close">
                         <i class="fas fa-times text-dark fs-5"></i>
                     </button>
                 </div>
@@ -156,7 +180,7 @@ All Users - HMS Tech & Solutions
 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Save User</button>
-                    <button type="button" id="userCancelBtn" class="btn btn-secondary">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </form>
@@ -164,14 +188,14 @@ All Users - HMS Tech & Solutions
 </div>
 
 {{-- Modal: View User --}}
-<div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
+            <div class="modal-header">
                 <h5 class="modal-title">User Info</h5>
-                <button type="button" id="viewCloseBtn" class="btn btn-sm" aria-label="Close">
-                    <i class="fas fa-times text-dark fs-5"></i>
-                </button>
+                    <button type="button" id="closeModalBtn" class="btn btn-sm" aria-label="Close">
+                        <i class="fas fa-times text-dark fs-5"></i>
+                    </button>
             </div>
             <div class="modal-body">
                 <div class="mb-2"><strong>Name:</strong> <span id="viewName"></span></div>
@@ -180,7 +204,7 @@ All Users - HMS Tech & Solutions
                 <div class="mb-2"><strong>Role:</strong> <span id="viewRole"></span></div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="viewCancelBtn" class="btn btn-secondary">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -192,8 +216,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const userForm = document.getElementById('userForm');
     const userModalEl = document.getElementById('userModal');
     const userModal = new bootstrap.Modal(userModalEl);
-    const viewModalEl = document.getElementById('viewUserModal');
-    const viewModal = new bootstrap.Modal(viewModalEl);
     const modalTitle = document.querySelector('#userModal .modal-title');
     const formMethodInput = document.getElementById('formMethod');
 
@@ -240,7 +262,8 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('viewUsername').innerText = this.dataset.username;
             document.getElementById('viewEmail').innerText = this.dataset.email;
             document.getElementById('viewRole').innerText = this.dataset.role;
-            viewModal.show();
+
+            new bootstrap.Modal(document.getElementById('viewUserModal')).show();
         });
     });
 
@@ -291,13 +314,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ✅ Close Add/Edit modal (❌ & Cancel)
-    document.querySelectorAll('#userModal #userCloseBtn, #userModal #userCancelBtn')
-        .forEach(btn => btn.addEventListener('click', () => userModal.hide()));
-
-    // ✅ Close View modal (❌ & Cancel)
-    document.querySelectorAll('#viewUserModal #viewCloseBtn, #viewUserModal #viewCancelBtn')
-        .forEach(btn => btn.addEventListener('click', () => viewModal.hide()));
+    // Close modal button
+    document.getElementById('closeModalBtn').addEventListener('click', function() {
+        userModal.hide();
+    });
 });
 </script>
 @endsection

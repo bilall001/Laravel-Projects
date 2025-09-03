@@ -13,11 +13,13 @@
         </div>
 
         <!-- Right side: Button -->
+        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
         <div class="col-md-6 d-flex justify-content-end">
             <button class="btn btn-success shadow-sm" id="addTeamBtn">
                 <i class="bi bi-plus-circle"></i> Add Team
             </button>
         </div>
+        @endif
     </div>
 
     @if (session('success'))

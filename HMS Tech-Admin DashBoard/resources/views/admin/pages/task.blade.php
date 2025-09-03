@@ -8,7 +8,9 @@ Tasks - HMS Tech & Solutions
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="page-title">Manage Tasks</h4>
+        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
         <button class="btn btn-primary" id="createTaskBtn">Assign Task</button>
+        @endif
     </div>
 
     {{-- Success Message --}}

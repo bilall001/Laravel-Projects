@@ -17,12 +17,12 @@ Salaries - HMS Tech & Solutions
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
-
+    @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
     {{-- Pay button --}}
     <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#salaryModal">
         <i class="fas fa-plus"></i> Pay Salary
     </button>
-
+    @endif
     <div class="card">
         <div class="card-header text-white" style="background-color: #1D2C48">All Salaries</div>
         <div class="card-body table-responsive">

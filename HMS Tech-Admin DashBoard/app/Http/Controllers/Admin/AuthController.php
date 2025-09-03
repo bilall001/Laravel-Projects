@@ -36,15 +36,13 @@ class AuthController extends Controller
                 return redirect()->route('developers.index'); // Developer sees own dashboard
             } elseif ($user->role === 'client') {
                 return redirect()->route('client.dashboard'); // Client sees their dashboard
-            }
-             elseif ($user->role === 'team manager') {
+            } elseif ($user->role === 'team manager') {
                 return redirect()->route('teamManager.dashboard'); // Client sees their dashboard
+            } elseif ($user->role === 'partner') {
+                return redirect()->route('admin.dashboard'); // Client sees their dashboard
+            } elseif ($user->role === 'business developer') {
+                return redirect()->route('business-developer.dashboard'); // ✅ new redirect
             }
-             elseif ($user->role === 'partner') {
-                return redirect()->route('admin.index'); // Client sees their dashboard
-            }elseif ($user->role === 'business developer') {
-    return redirect()->route('business-developer.dashboard'); // ✅ new redirect
-}
 
 
             // Unknown role

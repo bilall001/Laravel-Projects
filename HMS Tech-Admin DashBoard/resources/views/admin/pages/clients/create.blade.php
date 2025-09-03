@@ -8,9 +8,11 @@ Client - HMS Tech & Solutions
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="page-title">👥 Manage Clients</h4>
+        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
         <button class="btn btn-primary" id="createClientBtn">
             <i class="bi bi-person-plus"></i> Add Client
         </button>
+        @endif
     </div>
 
     {{-- Flash Messages --}}
@@ -39,7 +41,9 @@ Client - HMS Tech & Solutions
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Gender</th>
+                        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
                         <th>Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +56,7 @@ Client - HMS Tech & Solutions
                             <td>
                                 <div class="d-flex align-items-center gap-1">
                                     {{-- View --}}
-                                    <button 
+                                    {{-- <button 
                                       class="btn btn-sm btn-light view-client-btn" 
                                       data-name="{{ $client->user->name }}"
                                       data-email="{{ $client->user->email }}"
@@ -61,8 +65,8 @@ Client - HMS Tech & Solutions
                                       title="View"
                                     >
                                       <i class="fas fa-eye text-primary"></i>
-                                    </button>
-
+                                    </button> --}}
+                                    @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
                                     {{-- Edit --}}
                                     <button 
                                       class="btn btn-sm btn-light edit-client-btn"
@@ -93,6 +97,7 @@ Client - HMS Tech & Solutions
                                       </button>
                                     </form>
                                 </div>
+                                @endif
                             </td>
                         </tr>
                     @empty

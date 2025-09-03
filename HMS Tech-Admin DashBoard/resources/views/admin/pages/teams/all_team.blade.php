@@ -8,9 +8,11 @@ Team - HMS Tech  & Solutions
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
       <h3 class="mb-0 text-white">📋 All Teams</h3>
+      @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
       <a href="{{ route('teams.create') }}" class="btn btn-light text-primary fw-bold">
         <i class="bi bi-plus-circle me-1"></i> Create Team
       </a>
+      @endif
     </div>
 
     <div class="card-body p-0">

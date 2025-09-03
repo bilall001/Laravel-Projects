@@ -1,14 +1,19 @@
 @extends('admin.layouts.main')
-
+@section('title')
+    Projects - HMS Tech & Solutions
+@endsection
 @section('content')
     <div class="container-fluid">
         <div class="row mb-3">
             <div class="col-md-6">
                 <h4 class="page-title">Projects</h4>
             </div>
+            @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
+
             <div class="col-md-6 text-md-right">
                 <a href="{{ route('admin.projects.index', ['add' => true]) }}" class="btn btn-primary">Add Project</a>
             </div>
+            @endif
         </div>
 
         @if (session('success'))

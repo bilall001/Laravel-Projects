@@ -15,13 +15,27 @@ class PartnerController extends Controller
     /**
      * Admin: Show all partners
      */
-    public function index()
-    {
+public function index()
+{
+    $user = auth()->user();
+    // If the user is admin, business developer, or team manager, show all partners
+    if ($user->role ==='admin' || $user->role==='business developer' || $user->role==='team manager') {
+        // Fetch all partners with their investments and associated user data
         $partners = Partner::with('investments', 'user')->get();
-        $partnerUsers = AddUser::where('role', 'partner')->get();
-        // dd($partnerUsers);
-        return view('admin.pages.partner', compact('partners', 'partnerUsers'));
+    } else {
+        // If the user is a partner, only show their own data
+        $partners = Partner::with('investments', 'user')
+            ->where('user_id', $user->id) // Assuming 'user_id' is the foreign key linking Partner to User
+            ->get();
     }
+
+    // Fetch users with the 'partner' role
+    $partnerUsers = AddUser::where('role', 'partner')->get();
+
+    // Return the view with the filtered partners data and the users with 'partner' role
+    return view('admin.pages.partner', compact('partners', 'partnerUsers'));
+}
+
 
     /**
      * Admin: Store a new partner

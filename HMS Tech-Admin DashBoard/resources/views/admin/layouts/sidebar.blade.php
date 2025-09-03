@@ -84,7 +84,29 @@
                                 <i class="mdi mdi-account-tie-outline" style="font-size: 18px;"></i> Clients
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('leads.index') }}">
+                                <i class="mdi mdi-magnify" style="font-size: 18px;"></i> Leads
+                            </a>
+                        </li>
+                        
+                        <!-- Manage Partners -->
+                        <li>
+                            <a href="{{ route('admin.partners.index') }}">
+                                <i class="bi bi-people"
+                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
+                                Manage Partners
+                            </a>
+                        </li>
 
+                        <!-- Manage Business Developers -->
+                        <li>
+                            <a href="{{ route('business-developers.index') }}">
+                                <i class="bi bi-people"
+                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
+                                Business Developer
+                            </a>
+                        </li>
                         <!-- Company Expense -->
                         <li>
                             <a href="{{ route('companyExpense.index') }}">
@@ -107,7 +129,7 @@
                         </li>
                         <li>
                             <a href="{{ route('team_managers.index') }}">
-                                <i class="mdi mdi-account-tie" style="font-size: 18px;"></i> Manage Teams
+                                <i class="mdi mdi-account-tie" style="font-size: 18px;"></i> Manage Team Managers
                             </a>
                         </li>
 
@@ -149,23 +171,6 @@
                             </a>
                         </li>
 
-                        <!-- Manage Partners -->
-                        <li>
-                            <a href="{{ route('admin.partners.index') }}">
-                                <i class="bi bi-people"
-                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
-                                Manage Partners
-                            </a>
-                        </li>
-
-                        <!-- Manage Business Developers -->
-                        <li>
-                            <a href="{{ route('business-developers.index') }}">
-                                <i class="bi bi-people"
-                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
-                                Business Developer
-                            </a>
-                        </li>
 
 
 
@@ -193,6 +198,18 @@
                         <li>
                             <a href="{{ route('business-developer.dashboard') }}">
                                 <i class="mdi mdi-view-dashboard-outline" style="font-size: 18px;"></i> Dashboard
+                            </a>
+                        </li>
+
+                         <li>
+                            <a href="{{ route('leads.index') }}">
+                                <i class="mdi mdi-magnify" style="font-size: 18px;"></i> Leads
+                            </a>
+                        </li>
+
+                          <li>
+                            <a href="{{ route('admin.projects.index') }}">
+                                <i class="mdi mdi-briefcase-outline" style="font-size: 18px;"></i> Manage Projects
                             </a>
                         </li>
                         <li>
@@ -226,6 +243,41 @@
                         <li>
                             <a href="{{ route('partner.dashboard') }}">
                                 <i class="mdi mdi-briefcase-account-outline" style="font-size: 18px;"></i> Dashboard
+                            </a>
+                        </li>
+                         <li>
+                            <a href="{{ route('developers.create') }}">
+                                <i class="mdi mdi-code-braces" style="font-size: 18px;"></i> Developers
+                            </a>
+                        </li>
+
+                        <!-- Clients -->
+                        <li>
+                            <a href="{{ route('clients.index') }}">
+                                <i class="mdi mdi-account-tie-outline" style="font-size: 18px;"></i> Clients
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('leads.index') }}">
+                                <i class="mdi mdi-magnify" style="font-size: 18px;"></i> Leads
+                            </a>
+                        </li>
+                        
+                        <!-- Manage Partners -->
+                        <li>
+                            <a href="{{ route('admin.partners.index') }}">
+                                <i class="bi bi-people"
+                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
+                                Manage Partners
+                            </a>
+                        </li>
+
+                        <!-- Manage Business Developers -->
+                        <li>
+                            <a href="{{ route('business-developers.index') }}">
+                                <i class="bi bi-people"
+                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
+                                Business Developer
                             </a>
                         </li>
                     @endif

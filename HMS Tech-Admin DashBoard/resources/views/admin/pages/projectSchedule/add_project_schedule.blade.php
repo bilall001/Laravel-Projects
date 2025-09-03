@@ -10,9 +10,11 @@
         <div class="card shadow-sm border-0 mb-3">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0 text-primary fw-bold">📅 Project Schedules</h4>
+                @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
                 <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal">
                     <i class="bi bi-plus-circle"></i> Add Schedule
                 </button>
+                @endif
             </div>
         </div>
 

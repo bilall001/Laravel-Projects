@@ -6,9 +6,11 @@
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="page-title">💻 Manage Developers</h4>
+        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
         <button class="btn btn-primary" id="createDeveloperBtn">
             <i class="bi bi-plus-circle"></i> Add Developer
         </button>
+        @endif
     </div>
 
     {{-- Flash Messages --}}
@@ -28,7 +30,9 @@
                         <th>Experience</th>
                         <th>Work Type</th>
                         <th>Salary</th>
+                        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
                         <th class="text-center">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -45,9 +49,10 @@
                             </td>
                             <td>₨{{ number_format($developer->salary, 2) }}</td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-outline-info view-dev-btn" data-dev='@json($developer)'>
+                                {{-- <button class="btn btn-sm btn-outline-info view-dev-btn" data-dev='@json($developer)'>
                                     <i class="fas fa-eye"></i>
-                                </button>
+                                </button> --}}
+                                @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
                                 <button class="btn btn-sm btn-outline-primary edit-dev-btn" data-dev='@json($developer)'>
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -55,6 +60,7 @@
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
                                 </form>
+                                @endif
                             </td>
                         </tr>
                     @empty
