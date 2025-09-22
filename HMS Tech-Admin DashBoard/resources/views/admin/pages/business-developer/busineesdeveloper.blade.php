@@ -8,7 +8,7 @@
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="page-title">💼 Business Developers</h4>
-        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
+        @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' )
         <button class="btn btn-primary" id="createBizDevBtn">
             <i class="bi bi-plus-circle"></i> Add Business Developer
         </button>
@@ -33,7 +33,9 @@
                         <th>Percentage</th>
                         <th>Image</th>
                         <th>CNIC</th>
+                         @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer')
                         <th class="text-center">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -53,7 +55,7 @@
                                     <img src="{{ Storage::url($dev->cnic_front) }}" alt="CNIC Front" width="50">
                                     <img src="{{ Storage::url($dev->cnic_back) }}" alt="CNIC Back" width="50">
                                 @endif
-                            </td>
+                            </td> @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer')
                             <td class="text-center">
                                 <button class="btn btn-sm btn-outline-info view-bizdev-btn" data-dev='@json($dev)'>
                                     <i class="fas fa-eye"></i>
@@ -66,6 +68,7 @@
                                     <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
                     @empty
                         <tr><td colspan="7" class="text-center text-muted py-4">No business developers found.</td></tr>

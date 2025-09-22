@@ -24,7 +24,7 @@ class AddUser extends Model
 
 public function developer()
 {
-    return $this->hasOne(Developer::class, 'add_user_id');
+    return $this->hasMany(Developer::class, 'add_user_id');
 }
 public function clients()
 {
@@ -32,7 +32,7 @@ public function clients()
 }
 public function teams()
 {
-    return $this->belongsToMany(Team::class, 'team_user', 'user_id', 'team_id');
+    return $this->belongsToMany(Team::class, 'team_user', 'developer_id', 'team_id');
 }
 public function teamManager()
 {

@@ -22,7 +22,7 @@
 <script src="{{ asset('assets/admin/pages/jquery.tabledit.init.js') }}"></script>
 
 {{-- Forms --}}
-<script src="{{ asset('assets/adminplugins/parsleyjs/parsley.min.js') }}"></script>
+<script src="{{ asset('assets/admin/plugins/parsleyjs/parsley.min.js') }}"></script>
 <script src="{{ asset('assets/admin/pages/jquery.validation.init.js') }}"></script>
 
 <!-- App js -->
@@ -46,12 +46,10 @@
  <script src="{{ asset('assets/admin/plugins/datatables/responsive.bootstrap4.min.js') }}"></script>
  <script src="{{ asset('assets/admin/pages/jquery.datatable.init.js') }}"></script>
 
-
-
-
-
  <script src="https://unpkg.com/lucide@latest"></script>
-@yield('custom_js')
+ <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+@stack('custom_js')
 
 </body>
 

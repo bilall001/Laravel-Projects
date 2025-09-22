@@ -26,7 +26,9 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Investments</th>
+                        @if (auth()->user()->role === 'admin')
                         <th>Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -61,6 +63,7 @@
                                     </div>
                                 @endforeach
                             </td>
+                            @if (auth()->user()->role === 'admin')
                             <td>
 
                                 <div class="d-flex align-items-center gap-1">
@@ -78,7 +81,7 @@
                                     </form>
                                 </div>
                             </td>
-
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>

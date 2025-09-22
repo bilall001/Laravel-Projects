@@ -147,41 +147,41 @@ public function index()
     /**
      * Partner: Show login form
      */
-    public function showLoginForm()
-    {
-        return view('partner.login'); // Ensure this view exists
-    }
+    // public function showLoginForm()
+    // {
+    //     return view('partner.login'); // Ensure this view exists
+    // }
 
     /**
      * Partner: Handle login
      */
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+    // public function login(Request $request)
+    // {
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //         'password' => 'required|string',
+    //     ]);
 
-        $credentials = $request->only('email', 'password');
+    //     $credentials = $request->only('email', 'password');
 
-        if (Auth::guard('partner')->attempt($credentials)) {
-            return redirect()->intended(route('partner.dashboard'));
-        }
+    //     if (Auth::guard('partner')->attempt($credentials)) {
+    //         return redirect()->intended(route('admin.dashboard'));
+    //     }
 
-        return back()->withErrors(['email' => 'Invalid credentials.']);
-    }
+    //     return back()->withErrors(['email' => 'Invalid credentials.']);
+    // }
 
     /**
      * Partner: Handle logout
      */
-    public function logout(Request $request)
-    {
-        Auth::guard('partner')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    // public function logout(Request $request)
+    // {
+    //     Auth::guard('partner')->logout();
+    //     $request->session()->invalidate();
+    //     $request->session()->regenerateToken();
 
-        return redirect()->route('partner.login');
-    }
+    //     return redirect()->route('partner.login');
+    // }
 
     /**
      * Partner: Dashboard after login
@@ -189,6 +189,6 @@ public function index()
     public function dashboard()
     {
         $partner = Auth::guard('partner')->user();
-        return view('partner.dashboard', compact('partner'));
+        return view('admin.dashboard', compact('partner'));
     }
 }

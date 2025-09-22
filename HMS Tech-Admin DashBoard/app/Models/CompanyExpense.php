@@ -12,6 +12,7 @@ class CompanyExpense extends Model
 
       protected $fillable = [
         'title',
+        'salary_id',
         'description',
         'amount',
         'currency',

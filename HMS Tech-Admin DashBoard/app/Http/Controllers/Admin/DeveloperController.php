@@ -187,15 +187,18 @@ class DeveloperController extends Controller
             'salary' => 'nullable|numeric',
             'time_type' => 'nullable|string|in:part_time,full_time',
             'job_type' => 'nullable|string|in:internship,job',
-            'salary_type' => 'nullable|string|in:salary,project',
+            'salary_type' => 'required|string|in:salary_based,project_based',
         ]);
-
+        // dd($data);
         // Reset work types
         $data['part_time'] = $data['time_type'] === 'part_time';
         $data['full_time'] = $data['time_type'] === 'full_time';
         $data['internship'] = $data['job_type'] === 'internship';
         $data['job'] = $data['job_type'] === 'job';
 
+        if ($data['salary_type'] === 'project_based') {
+            $data['salary'] = null;
+        }
         foreach (['profile_image', 'cnic_front', 'cnic_back', 'contract_file'] as $fileField) {
             if ($request->hasFile($fileField)) {
                 $file = $request->file($fileField);
@@ -232,6 +235,7 @@ class DeveloperController extends Controller
             'contract_file' => 'nullable|file',
             'time_type' => 'nullable|string|in:part_time,full_time',
             'job_type' => 'nullable|string|in:internship,job',
+            'salary_type' => 'nullable|string|in:salary_based,project_based',
         ]);
 
         $developer->fill($data);

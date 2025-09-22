@@ -11,9 +11,11 @@
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0 text-primary fw-bold">📅 Project Schedules</h4>
                 @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
-                <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="bi bi-plus-circle"></i> Add Schedule
-                </button>
+                                                      {{-- Add Schedule button --}}
+<button class="btn btn-success shadow-sm" data-toggle="modal" data-target="#addModal">
+    <i class="bi bi-plus-circle"></i> Add Schedule
+</button>
+
                 @endif
             </div>
         </div>
@@ -50,21 +52,31 @@
                                 <td>
                                     <div class="d-flex align-items-center gap-1 justify-content-center">
                                         {{-- View --}}
-                                        <button class="btn btn-sm btn-light view-schedule-btn" data-bs-toggle="modal"
-                                            data-bs-target="#viewModal" data-title="{{ $schedule->project->title }}"
-                                            data-date="{{ $schedule->date }}" data-status="{{ ucfirst($schedule->status) }}"
-                                            title="View">
-                                            <i class="fas fa-eye text-primary"></i>
-                                        </button>
 
-                                        {{-- Edit --}}
-                                        <button class="btn btn-sm btn-light edit-schedule-btn" data-id="{{ $schedule->id }}"
-                                            data-title="{{ $schedule->project->title ?? '' }}"
-                                            data-date="{{ $schedule->date }}" data-status="{{ $schedule->status }}"
-                                            data-project="{{ $schedule->project_id }}" data-bs-toggle="modal"
-                                            data-bs-target="#editModal" title="Edit">
-                                            <i class="fas fa-edit text-info"></i>
-                                        </button>
+{{-- View --}}
+<button class="btn btn-sm btn-light view-schedule-btn"
+    data-toggle="modal"
+    data-target="#viewModal"
+    data-title="{{ $schedule->project->title }}"
+    data-date="{{ $schedule->date }}"
+    data-status="{{ ucfirst($schedule->status) }}"
+    title="View">
+    <i class="fas fa-eye text-primary"></i>
+</button>
+
+{{-- Edit --}}
+<button class="btn btn-sm btn-light edit-schedule-btn"
+    data-id="{{ $schedule->id }}"
+    data-title="{{ $schedule->project->title ?? '' }}"
+    data-date="{{ $schedule->date }}"
+    data-status="{{ $schedule->status }}"
+    data-project="{{ $schedule->project_id }}"
+    data-toggle="modal"
+    data-target="#editModal"
+    title="Edit">
+    <i class="fas fa-edit text-info"></i>
+</button>
+
 
                                         {{-- Delete --}}
                                         <form action="{{ route('projectSchedule.destroy', $schedule->id) }}" method="POST"
@@ -97,7 +109,10 @@
                 @csrf
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">➕ Add Schedule</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                   {{-- Add/Edit/View modal close --}}
+<button type="button" class="close" data-dismiss="modal">
+    <span>&times;</span>
+</button>
                 </div>
                 <div class="modal-body">
                     @if ($errors->any())
@@ -192,7 +207,10 @@
                 @method('PUT')
                 <div class="modal-header bg-warning text-white">
                     <h5 class="modal-title">✏️ Edit Schedule</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    {{-- Add/Edit/View modal close --}}
+<button type="button" class="close" data-dismiss="modal">
+    <span>&times;</span>
+</button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -231,7 +249,10 @@
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
                     <h5 class="modal-title">📄 Schedule Details</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  {{-- Add/Edit/View modal close --}}
+<button type="button" class="close" data-dismiss="modal">
+    <span>&times;</span>
+</button>
                 </div>
                 <div class="modal-body">
                     <p><strong>Title:</strong> <span id="viewTitle"></span></p>
@@ -241,28 +262,39 @@
             </div>
         </div>
     </div>
-
-    {{-- JS for Modals --}}
-    <script>
-
-        document.getElementById('editModal').addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const id = button.getAttribute('data-id');
-            const projectId = button.getAttribute('data-project');
-
-            this.querySelector('#editProject').value = projectId;
-            this.querySelector('#editDate').value = button.getAttribute('data-date');
-            this.querySelector('#editStatus').value = button.getAttribute('data-status');
-
-            // Set correct action with ID
-            this.querySelector('#editForm').action = "/projectSchedule/" + id;
-        });
-        // View modal fill
-        document.getElementById('viewModal').addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            this.querySelector('#viewTitle').innerText = button.getAttribute('data-title');
-            this.querySelector('#viewDate').innerText = button.getAttribute('data-date');
-            this.querySelector('#viewStatus').innerText = button.getAttribute('data-status');
-        });
-    </script>
 @endsection
+ @push('custom_js')
+    {{-- JS for Modals --}}
+   <script>
+    // EDIT modal (Bootstrap 4 jQuery)
+    $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var id = button.data('id');
+        var projectId = button.data('project');
+        var date = button.data('date');
+        var status = button.data('status');
+
+        var modal = $(this);
+        modal.find('#editProject').val(projectId);
+        modal.find('#editDate').val(date);
+        modal.find('#editStatus').val(status);
+
+        // update form action with ID
+        modal.find('#editForm').attr('action', '/projectSchedule/' + id);
+    });
+
+    // VIEW modal (Bootstrap 4 jQuery)
+    $('#viewModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var title = button.data('title');
+        var date = button.data('date');
+        var status = button.data('status');
+
+        var modal = $(this);
+        modal.find('#viewTitle').text(title);
+        modal.find('#viewDate').text(date);
+        modal.find('#viewStatus').text(status);
+    });
+</script>
+
+@endpush

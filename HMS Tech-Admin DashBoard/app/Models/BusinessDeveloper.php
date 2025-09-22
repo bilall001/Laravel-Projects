@@ -23,6 +23,10 @@ class BusinessDeveloper extends Model
     {
         return $this->belongsTo(AddUser::class, 'add_user_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(AddUser::class, 'add_user_id');
+    }
     public function leads()
 {
     return $this->hasMany(Lead::class, 'business_developer_id');

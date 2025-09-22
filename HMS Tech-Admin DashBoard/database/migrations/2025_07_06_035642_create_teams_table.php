@@ -20,9 +20,9 @@ class CreateTeamsTable extends Migration
             $table->foreignId('team_id')->constrained()->onDelete('cascade');
 
             // FIXED: Point user_id to add_users table, not users table
-            $table->foreignId('user_id')
+            $table->foreignId('developer_id')
                 ->references('id')
-                ->on('add_users')
+                ->on('developers')
                 ->onDelete('cascade');
 
             $table->timestamps(); // optional but useful for pivot table tracking

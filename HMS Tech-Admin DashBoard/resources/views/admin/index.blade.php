@@ -3,7 +3,6 @@
     Admin - HMS tech & Solutions
 @endsection
 @section('custom_css')
-    z
     <style>
         #ana_dash_1 {
             padding-top: 20px;
@@ -523,7 +522,7 @@
 
     </div><!-- container -->
 @endsection
-@section('custom_js')
+@push('custom_js')
     <script>
         lucide.createIcons();
         document.addEventListener('DOMContentLoaded', function() {
@@ -911,4 +910,4 @@
             chart.render();
         });
     </script>
-@endsection
+@endpush

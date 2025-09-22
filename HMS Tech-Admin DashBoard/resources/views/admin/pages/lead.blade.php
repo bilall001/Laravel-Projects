@@ -51,34 +51,38 @@
                                 <td>{{ $lead->next_follow_up ?? 'N/A' }}</td>
                                 <td>
                                     {{-- View Button --}}
-                                    <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
-                                        data-bs-target="#leadShowModal{{ $lead->id }}">
+                                    <button class="btn btn-sm btn-outline-info" data-toggle="modal" +
+                                        data-target="#leadShowModal{{ $lead->id }}">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
-                                    {{-- Edit Button --}}
-                                    <button class="btn btn-sm btn-outline-primary edit-lead-btn"
-                                        data-id="{{ $lead->id }}" data-url="{{ route('leads.update', $lead->id) }}"
-                                        data-title="{{ $lead->lead_title }}"
-                                        data-description="{{ $lead->lead_description }}" data-status="{{ $lead->status }}"
-                                        data-source="{{ $lead->lead_get_by }}" data-budget="{{ $lead->expected_budget }}"
-                                        data-start="{{ $lead->expected_start_date }}"
-                                        data-person="{{ $lead->contact_person }}" data-email="{{ $lead->contact_email }}"
-                                        data-phone="{{ $lead->contact_phone }}" data-follow="{{ $lead->next_follow_up }}"
-                                        data-notes="{{ $lead->notes }}" data-platform='@json($lead->{$lead->lead_get_by} ?? [])'
-                                        title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-
-                                    {{-- Delete Form --}}
-                                    <form action="{{ route('leads.destroy', $lead->id) }}" method="POST" class="d-inline"
-                                        onsubmit="return confirm('Are you sure?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                            <i class="fas fa-trash"></i>
+                                    @if (auth()->user()->role === 'admin' ||
+                                            auth()->user()->role === 'business developer' ||
+                                            auth()->user()->role === 'team manager')
+                                        {{-- Edit Button --}}
+                                        <button class="btn btn-sm btn-outline-primary edit-lead-btn"
+                                            data-id="{{ $lead->id }}" data-url="{{ route('leads.update', $lead->id) }}"
+                                            data-title="{{ $lead->lead_title }}"
+                                            data-description="{{ $lead->lead_description }}"
+                                            data-status="{{ $lead->status }}" data-source="{{ $lead->lead_get_by }}"
+                                            data-budget="{{ $lead->expected_budget }}"
+                                            data-start="{{ $lead->expected_start_date }}"
+                                            data-person="{{ $lead->contact_person }}"
+                                            data-email="{{ $lead->contact_email }}"
+                                            data-phone="{{ $lead->contact_phone }}"
+                                            data-follow="{{ $lead->next_follow_up }}" data-notes="{{ $lead->notes }}"
+                                            data-platform='@json($lead->{$lead->lead_get_by} ?? [])' title="Edit">
+                                            <i class="fas fa-edit"></i>
                                         </button>
-                                    </form>
+
+                                        {{-- Delete Form --}}
+                                        <form action="{{ route('leads.destroy', $lead->id) }}" method="POST"
+                                            class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     @endif
                                 </td>
                             </tr>
@@ -407,7 +411,9 @@
                     <div class="modal-content shadow-lg border-0 rounded-3">
                         <div class="modal-header bg-primary text-white rounded-top">
                             <h5 class="modal-title fw-bold"><i class="fas fa-user"></i> Lead Details</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
++   <span aria-hidden="true">&times;</span>
++ </button>
                         </div>
 
                         <div class="modal-body p-4" style="font-family: 'Poppins', sans-serif;">
@@ -516,7 +522,7 @@
                         </div>
 
                         <div class="modal-footer bg-light rounded-bottom">
-                            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+                           <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>

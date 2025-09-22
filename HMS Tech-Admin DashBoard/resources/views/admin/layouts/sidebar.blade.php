@@ -71,6 +71,13 @@
                             </a>
                         </li>
 
+                        <!-- Khata -->
+                        <li>
+                            <a href="{{ route('khata.accounts.index') }}">
+                                <i class="mdi-file-document-outline" style="font-size: 18px;"></i> Khata Account
+                            </a>
+                        </li>
+
                         <!-- Developers -->
                         <li>
                             <a href="{{ route('developers.create') }}">
@@ -142,7 +149,7 @@
 
                         <!-- Manage Tasks -->
                         <li>
-                            <a href="{{ route('admin.tasks.index') }}">
+                            <a href="{{ route('tasks.index') }}">
                                 <i class="mdi mdi-clipboard-check-outline" style="font-size: 18px;"></i> Manage Tasks
                             </a>
                         </li>
@@ -170,6 +177,12 @@
                                 <i class="mdi mdi-currency-usd" style="font-size: 18px;"></i> Manage Salaries
                             </a>
                         </li>
+                        {{-- manage Developer projects salaries --}}
+                        <li>
+                            <a href="{{ route('developer_project_payments.index') }}">
+                                <i class="mdi mdi-cash-multiple" style="font-size: 18px;"></i> Manage Project Payments
+                            </a>
+                        </li>
 
 
 
@@ -186,7 +199,7 @@
                         <li><a href="{{ route('admin.teams.index') }}">
                                 <i class="mdi mdi-account-group-outline" style="font-size: 18px;"></i> Manage Teams
                             </a></li>
-                        <li><a href="{{ route('admin.tasks.index') }}">
+                        <li><a href="{{ route('tasks.index') }}">
                                 <i class="mdi mdi-clipboard-check-outline" style="font-size: 18px;"></i> Manage Tasks
                             </a></li>
 
@@ -241,7 +254,7 @@
                     @endif
                     @if (auth()->check() && auth()->user()->role === 'partner')
                         <li>
-                            <a href="{{ route('partner.dashboard') }}">
+                            <a href="{{ route('admin.dashboard') }}">
                                 <i class="mdi mdi-briefcase-account-outline" style="font-size: 18px;"></i> Dashboard
                             </a>
                         </li>

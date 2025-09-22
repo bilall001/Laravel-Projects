@@ -19,7 +19,7 @@ Salaries - HMS Tech & Solutions
     @endif
     @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
     {{-- Pay button --}}
-    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#salaryModal">
+    <button class="btn btn-success mb-3" data-toggle="modal" data-target="#salaryModal">
         <i class="fas fa-plus"></i> Pay Salary
     </button>
     @endif
@@ -45,7 +45,7 @@ Salaries - HMS Tech & Solutions
                             <td>{{ $salary->addUser->name ?? '-' }}</td>
                             <td>{{ $salary->addUser->email ?? '-' }}</td>
                             <td>{{ $salary->salary_date }}</td>
-                            <td><span class="text-success fw-bold">${{ number_format($salary->amount, 2) }}</span></td>
+                            <td><span class="text-success fw-bold">Rs{{ number_format($salary->amount, 2) }}</span></td>
                             <td>{{ $salary->payment_method }}</td>
                             <td>
                                 @if($salary->payment_receipt)
@@ -57,7 +57,7 @@ Salaries - HMS Tech & Solutions
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-{{ $salary->is_paid ? 'success' : 'secondary' }}">
+                                <span class="badge badge-{{ $salary->is_paid ? 'success' : 'secondary' }}">
                                     {{ $salary->is_paid ? 'Paid' : 'Unpaid' }}
                                 </span>
                             </td>
@@ -72,8 +72,8 @@ Salaries - HMS Tech & Solutions
                                         data-amount="{{ $salary->amount }}"
                                         data-method="{{ $salary->payment_method }}"
                                         data-is_paid="{{ $salary->is_paid }}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#salaryModal"
+                                       data-toggle="modal"
+                                       data-target="#salaryModal"
                                         title="Edit"
                                     >
                                         <i class="fas fa-edit text-info"></i>
@@ -99,7 +99,7 @@ Salaries - HMS Tech & Solutions
 </div>
 
 {{-- Salary Modal --}}
-<div class="modal fade" id="salaryModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="salaryModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <form id="salaryForm" method="POST" enctype="multipart/form-data" class="modal-content">
             @csrf
@@ -107,7 +107,8 @@ Salaries - HMS Tech & Solutions
 
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">💵 Pay / Edit Salary</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+   <span aria-hidden="true">&times;</span> </button>
             </div>
 
             <div class="modal-body">
@@ -158,51 +159,58 @@ Salaries - HMS Tech & Solutions
 
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Save</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </form>
     </div>
 </div>
-
+@endsection
+@push('custom_js')
 {{-- Scripts --}}
 <script>
-    // Show/hide receipt input
-    document.addEventListener('change', function(e) {
-        if(e.target.name === "payment_method") {
-            document.getElementById('receiptInput').classList.toggle('d-none', e.target.value !== 'Account');
-        }
-    });
+  // Show/hide receipt input when payment method changes
+  document.addEventListener('change', function(e) {
+    if (e.target.name === "payment_method") {
+      document.getElementById('receiptInput').classList.toggle('d-none', e.target.value !== 'Account');
+    }
+  });
 
-    // Reset form on modal open (create mode)
-    document.querySelector('[data-bs-target="#salaryModal"]').addEventListener('click', function () {
-        const form = document.getElementById('salaryForm');
-        form.reset();
-        form.action = "{{ route('admin.salaries.store') }}";
-        document.getElementById('formMethod').value = 'POST';
-        document.getElementById('receiptInput').classList.add('d-none');
-    });
+  // If opening in CREATE mode (Pay Salary button), add a marker data-mode="create"
+  // <button ... data-toggle="modal" data-target="#salaryModal" data-mode="create">...</button>
 
-    // Edit modal logic
-    document.querySelectorAll('.editSalaryBtn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const form = document.getElementById('salaryForm');
-            form.action = `/admin/salaries/${this.dataset.id}`;
-            document.getElementById('formMethod').value = 'PUT';
-            document.getElementById('user_id').value = this.dataset.user_id;
-            document.getElementById('salary_date').value = this.dataset.salary_date;
-            document.getElementById('amount').value = this.dataset.amount;
+  // Bootstrap 4: use jQuery event for modal show/reset
+  $('#salaryModal').on('show.bs.modal', function (evt) {
+    const trigger = evt.relatedTarget;          // button that opened the modal
+    const form = document.getElementById('salaryForm');
 
-            // Payment method
-            document.querySelectorAll('input[name="payment_method"]').forEach(el => {
-                el.checked = (el.value === this.dataset.method);
-            });
+    // Default to CREATE
+    form.reset();
+    form.action = "{{ route('admin.salaries.store') }}";
+    document.getElementById('formMethod').value = 'POST';
+    document.getElementById('receiptInput').classList.add('d-none');
+    document.getElementById('isPaid').checked = false;
 
-            // Receipt toggle
-            document.getElementById('receiptInput').classList.toggle('d-none', this.dataset.method !== 'Account');
+    // If opened from an Edit button, fill fields
+    if (trigger && trigger.classList.contains('editSalaryBtn')) {
+      const id = trigger.dataset.id;
+      form.action = "/admin/salaries/" + id;   // or pass data-update_url in Blade and use that
+      document.getElementById('formMethod').value = 'PUT';
 
-            // Paid status
-            document.getElementById('isPaid').checked = this.dataset.is_paid == "1";
-        });
-    });
+      document.getElementById('user_id').value = trigger.dataset.user_id || '';
+      document.getElementById('salary_date').value = trigger.dataset.salary_date || '';
+      document.getElementById('amount').value = trigger.dataset.amount || '';
+
+      // Payment method
+      const method = trigger.dataset.method || 'Cash';
+      document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+        el.checked = (el.value === method);
+      });
+      document.getElementById('receiptInput').classList.toggle('d-none', method !== 'Account');
+
+      // Paid flag
+      document.getElementById('isPaid').checked = (trigger.dataset.is_paid === '1');
+    }
+  });
 </script>
-@endsection
+
+@endpush
