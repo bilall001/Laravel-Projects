@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('lead_upwork_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('lead_id')->constrained('leads')->onDelete('cascade');
-            $table->string('project_title');
+            $table->string('project_title')->nullable();
             $table->longText('proposal_cover_letter')->nullable();
             $table->integer('connect_bids')->default(0);
             $table->string('job_url')->nullable();

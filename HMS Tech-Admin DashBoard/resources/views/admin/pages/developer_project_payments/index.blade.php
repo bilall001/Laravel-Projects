@@ -3,7 +3,7 @@
     Developers Payment - HMS Tech & Solutions
 @endsection
 @section('content')
-    <div class="container mt-4">
+    <div class="container mt-5">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0 text-white">Developer Project Payments</h4>
@@ -47,7 +47,7 @@
                                     @if ($payment->payment_type === 'percentage')
                                         {{ $payment->amount }}%
                                     @else
-                                        ₨{{ number_format($payment->amount, 2) }}
+                                    PKR {{ number_format($payment->amount, 2) }}
                                     @endif
                                 </td>
 
@@ -97,7 +97,7 @@
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="createModalLabel">Add Payment</h5>
+                        <h5 class="modal-title text-white" id="createModalLabel">Add Payment</h5>
                         <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">

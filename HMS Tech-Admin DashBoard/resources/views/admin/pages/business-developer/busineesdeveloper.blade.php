@@ -3,7 +3,7 @@
     Business Developer - HMS Tech & Solutions
 @endsection
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid mt-3">
 
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -87,12 +87,12 @@
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="bizDevModalTitle">Add Business Developer</h5>
-                        <button type="button" class="btn-close btn-close-white close-bizdev-modal"></button>
+                        <button type="button" class="btn-close btn-close-white close-bizdev-modal">x</button>
                     </div>
                     <div class="modal-body row g-3">
                         <div class="col-md-6">
                             <label>Select User</label>
-                            <select name="add_user_id" class="form-select" required>
+                            <select name="add_user_id" class="form-control" required>
                                 <option value="">-- Select User --</option>
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->username }})</option>
@@ -107,7 +107,7 @@
 
                         <div class="col-md-6">
                             <label>Gender</label>
-                            <select name="gender" class="form-select">
+                            <select name="gender" class="form-control">
                                 <option value="">-- Select Gender --</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -149,7 +149,7 @@
             <div class="modal-content p-3">
                 <div class="modal-header bg-info text-white">
                     <h5 class="modal-title">Business Developer Details</h5>
-                    <button type="button" class="btn-close btn-close-white close-view-modal"></button>
+                    <button type="button" class="btn-close btn-close-white close-view-modal">x</button>
                 </div>
                 <div class="modal-body" id="viewBizDevContent"></div>
             </div>

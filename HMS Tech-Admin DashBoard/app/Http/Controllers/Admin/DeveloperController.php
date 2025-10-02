@@ -10,6 +10,8 @@ use App\Models\Developer;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Point;
+use App\Models\Task;
 
 class DeveloperController extends Controller
 {
@@ -17,84 +19,119 @@ class DeveloperController extends Controller
     {
         $user = auth()->user();
 
+        // inside your controller method...
         if ($user->role === 'developer') {
+            // 1) Find the developer row linked to this user
             $developer = Developer::where('add_user_id', $user->id)->first();
 
             if ($developer) {
-                $developer = Developer::where('add_user_id', $user->id)->first();
-                // $projects = Project::where('user_id', $user->id) // projects directly assigned to developer
-                //     ->orWhereHas('team.users', function ($query) use ($user) {
-                //         $query->where('add_users.id', $user->id); // projects assigned via team membership
-                //     })
-                //     ->count();
-
-                // $directProjects = Project::where('user_id', $user->id)->get();
-                // $directProjectsCount = $directProjects->count();
-                // $teamms = Team::whereHas('users', function ($query) use ($user) {
-                //     $query->where('add_users.id', $user->id);
-                // })->get();
-                // $teamProjects = Project::whereIn('team_id', $teamms->pluck('id'))->get();
-
-                // $teamProjectsCount = $teamProjects->count();
-                $directProjects = Project::where('user_id', $user->id)
-                    ->with('team', 'businessDeveloper')
+                // 2) Projects assigned DIRECTLY to this developer (project_developer pivot)
+                $directProjects = Project::query()
+                    ->whereHas('developers', function ($q) use ($developer) {
+                        $q->where('developers.id', $developer->id);
+                        // or: $q->where('project_developer.developer_id', $developer->id);
+                    })
+                    ->with(['teams', 'businessDeveloper'])
                     ->get()
                     ->map(function ($project) {
-                        $project->assignment_type = 'Individual';
+                        $project->setAttribute('assignment_type', 'Individual');
                         return $project;
                     });
                 $directProjectsCount = $directProjects->count();
 
-                // 🔹 Teams the developer belongs to
-                $teams = Team::whereHas('users', function ($query) use ($user) {
-                    $query->where('add_users.id', $user->id);
-                })->with('users')->get();
+                // 3) Teams the current user belongs to
+                $teams = Team::whereHas('developers', function ($q) use ($developer) {
+                    // adjust table/column names in where() to match your pivot if needed
+                    $q->where('developers.id', $developer->id);
+                })
+                    ->with('developers')
+                    ->get();
 
-                // 🔹 Team projects
-                $teamProjects = Project::whereIn('team_id', $teams->pluck('id'))
-                    ->with('team', 'businessDeveloper')
+                $teamIds = $teams->pluck('id');
+
+                // 4) Projects assigned to ANY of those teams (project_team pivot)
+                $teamProjects = Project::query()
+                    ->whereHas('teams', function ($q) use ($teamIds) {
+                        $q->whereIn('teams.id', $teamIds);
+                        // or: $q->whereIn('project_team.team_id', $teamIds);
+                    })
+                    ->with(['teams', 'businessDeveloper'])
                     ->get()
                     ->map(function ($project) {
-                        $project->assignment_type = 'Team';
+                        $project->setAttribute('assignment_type', 'Team');
                         return $project;
                     });
                 $teamProjectsCount = $teamProjects->count();
 
-                // 🔹 Combine projects for table
+                // 5) Combine for table
                 $allProjects = $directProjects->concat($teamProjects);
-                // dd($allProjects);
-                // $salary = Salary::where('add_user_id', $user->id)
-                //     ->orderBy('salary_date', 'desc')
-                //     ->get();
+
+                // 6) Salaries (paid only)
                 $salaries = Salary::where('add_user_id', $user->id)
                     ->where('is_paid', 1)
                     ->orderByDesc('salary_date')
                     ->get();
+
+                // 7) Attendance (this month)
                 $attendanceQuery = Attendance::where('user_id', $user->id)
                     ->whereMonth('date', now()->month)
                     ->whereYear('date', now()->year);
 
-                $totalDays = $attendanceQuery->count();
-                // dd($totalDays);
+                $totalDays = (clone $attendanceQuery)->count();
                 $presentDays = (clone $attendanceQuery)->where('status', 'present')->count();
                 $absentDays = (clone $attendanceQuery)->where('is_absent', 1)->count();
                 $leaveDays = (clone $attendanceQuery)->where('is_leave', 1)->count();
                 $attendancePercentage = $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0;
 
-                $teams = Team::whereHas('users', function ($query) use ($user) {
-                    $query->where('add_users.id', $user->id);
-                })
-                    ->with(['users' => function ($query) use ($user) {
-                        $query->where('add_users.id', '!=', $user->id); // exclude current developer
-                    }])
-                    ->get();
-                // dd($teams);
                 $teamCount = $teams->count();
+                // 8) Direct tasks assigned to this developer
+                $directTasks = Task::whereHas('developers', function ($q) use ($developer) {
+                    $q->where('developers.id', $developer->id);
+                })
+                    ->with('project')
+                    ->get()
+                    ->map(function ($task) {
+                        $task->assignment_type = 'Individual';
+                        return $task;
+                    });
+                $directTasksCount = $directTasks->count();
+
+                // 9) Tasks via team projects
+                $teamTasks = Task::whereHas('project.teams.developers', function ($q) use ($developer) {
+                    $q->where('developers.id', $developer->id);
+                })
+                    ->with('project')
+                    ->get()
+                    ->map(function ($task) {
+                        $task->assignment_type = 'Team';
+                        return $task;
+                    });
+                $teamTasksCount = $teamTasks->count();
+
+                // 10) Combine all tasks
+                $allTasks = $directTasks->concat($teamTasks);
+
+                // 11) Points calculation
+                $totalPoints = 0;
+                $bestScore = 0;
+                $submissionsCount = 0;
+
+                if ($developer) {
+                    $points = Point::where('developer_id', $developer->id)->get();
+                    $totalPoints = $points->sum('points');
+                    $bestScore = $points->max('points') ?? 0;
+                    $submissionsCount = $points->count();
+                }
             } else {
-                $projects = collect();
-                $salary = collect();
-                $attendance = collect();
+                // Safe defaults if no developer row found for this user
+                $developer = null;
+                $directProjectsCount = 0;
+                $teamProjectsCount = 0;
+                $allProjects = collect();
                 $teams = collect();
+                $teamCount = 0;
+                $salaries = collect();
+                $totalDays = $presentDays = $absentDays = $leaveDays = $attendancePercentage = 0;
             }
 
             return view('admin.pages.developers.dashboard', compact(
@@ -110,6 +147,12 @@ class DeveloperController extends Controller
                 'absentDays',
                 'leaveDays',
                 'attendancePercentage',
+                'allTasks',
+                'directTasksCount',
+                'teamTasksCount',
+                'totalPoints',
+                'bestScore',
+                'submissionsCount'
             ));
         } else {
             $developers = Developer::orderBy('created_at', 'desc')->get();

@@ -18,24 +18,19 @@ class Point extends Model
         'video_link',
         'video_file',
         'points',
+         'github_url', 
         'uploaded_at',
     ];
 
     public function developer() {
-        return $this->belongsTo(AddUser::class, 'developer_id');
+        return $this->belongsTo(Developer::class, 'developer_id');
     }
 
     public function team() {
-        return $this->belongsTo(Team::class);
+        return $this->belongsTo(Team::class,'team_id');
     }
 
     public function project() {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Project::class,'project_id');
     }
-
-    public function user()
-{
-    return $this->belongsTo(AddUser::class, 'developer_id'); 
-    // or use User::class if you use the default User model
-}
 }

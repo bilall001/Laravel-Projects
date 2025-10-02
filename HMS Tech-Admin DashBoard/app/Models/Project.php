@@ -9,9 +9,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Collection;
 
+/**
+ * @property string|null $assignment_type
+ */
 class Project extends Model
 {
     use HasFactory;
+    protected $appends = ['assignment_type'];
+
+    // default null if not set
+    public function getAssignmentTypeAttribute()
+    {
+        return $this->attributes['assignment_type'] ?? null;
+    }
     protected $fillable = [
         'client_id',
         'title',
@@ -47,7 +57,7 @@ class Project extends Model
     }
     public function team()
     {
-        return $this->belongsToMany(Team::class, 'project_team');
+        return $this->belongsTo(Team::class, 'project_team');
     }
     public function teams()
     {
@@ -69,7 +79,7 @@ class Project extends Model
     }
     public function tasks()
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Task::class,'project_id');
     }
     public function images()
     {
@@ -83,6 +93,10 @@ class Project extends Model
     {
         return $this->belongsToMany(Developer::class, 'project_member_roles')
             ->withPivot('role_id');
+    }
+     public function points()
+    {
+        return $this->hasMany(Point::class, 'project_id');
     }
     public function eligibleDevelopers(): Collection
     {

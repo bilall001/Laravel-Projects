@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cryptocurrency extends Model
 {
-    //
+    public function prices()
+{
+    return $this->hasMany(Price::class);
+
+}
 }

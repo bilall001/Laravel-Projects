@@ -16,7 +16,7 @@ return new class extends Migration
               $table->foreignId('lead_id')->constrained('leads')->onDelete('cascade');
 
             // General fields for any other platform
-            $table->string('platform_name'); // e.g. Twitter, WhatsApp, Google Ads
+            $table->string('platform_name')->nullable(); // e.g. Twitter, WhatsApp, Google Ads
             $table->string('platform_url')->nullable(); // URL if available (ad link, profile link, etc.)
             $table->string('campaign_name')->nullable(); // e.g. "Google Ads - Summer Campaign"
             $table->text('inquiry_message')->nullable(); // Client's message or inquiry

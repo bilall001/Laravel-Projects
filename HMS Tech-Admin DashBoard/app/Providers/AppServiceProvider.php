@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\DeveloperProjectPayment;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Models\Salary;
+use App\Observers\DeveloperProjectPaymentObserver;
 use App\Observers\SalaryObserver;
 use Illuminate\Pagination\Paginator;
 class AppServiceProvider extends ServiceProvider
@@ -36,5 +38,6 @@ class AppServiceProvider extends ServiceProvider
         'other'                => \App\Models\KhataAccount::class,
     ]);
     Salary::observe(SalaryObserver::class);
+    DeveloperProjectPayment::observe(DeveloperProjectPaymentObserver::class);
     }
 }

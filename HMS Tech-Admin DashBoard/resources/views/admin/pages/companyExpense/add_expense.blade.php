@@ -3,7 +3,7 @@
     Expense - HMS Tech & Solutions
 @endsection
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid mt-3">
 
         {{-- Header --}}
         <div class="d-flex justify-content-between align-items-center mb-4">

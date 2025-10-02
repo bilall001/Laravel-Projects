@@ -3,7 +3,7 @@
 Client - HMS Tech & Solutions
 @endsection
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid mt-3">
 
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -32,7 +32,7 @@ Client - HMS Tech & Solutions
 
     {{-- Clients Table --}}
     <div class="card">
-        <div class="card-header text-white" style="background-color: rgb(2, 2, 100)">Client List</div>
+        <div class="card-header text-white bg-dark" >Client List</div>
         <div class="card-body table-responsive">
             <table class="table table-hover mb-0">
                 <thead class="table-primary">
@@ -149,7 +149,7 @@ Client - HMS Tech & Solutions
 
                     <div class="mb-3">
                         <label>Gender</label>
-                        <select name="gender" id="clientGender" class="form-select" required>
+                        <select name="gender" id="clientGender" class="form-control" required>
                             <option value="">-- Select Gender --</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>

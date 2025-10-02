@@ -6,7 +6,7 @@
 @section('custom_css')
 
 @section('content')
-    <div class="container my-4">
+    <div class="container mt-3 my-4">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h4 mb-0">📒 Khata Accounts</h1>
@@ -34,6 +34,9 @@
         @endif
 
         <div class="card border-0 shadow-sm">
+             <div class="card-header bg-dark border-bottom">
+        <h5 class="mb-0 text-white">Khata List</h5>
+    </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">

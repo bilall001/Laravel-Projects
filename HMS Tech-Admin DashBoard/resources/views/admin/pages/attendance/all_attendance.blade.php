@@ -4,7 +4,7 @@ Attendance - HMS Tech  & Solutions
 @endsection
 @section('content')
 <div class="container my-5">
-  <h1 class="h3 mb-4 text-primary">
+  <h1 class="h3 mb-4 text-dark">
     📅 Attendance Management
   </h1>
 
@@ -21,7 +21,7 @@ Attendance - HMS Tech  & Solutions
     <form method="GET" class="row gx-3 gy-2 align-items-end">
       <div class="col">
         <label class="form-label fw-bold mb-1">Select Role</label>
-        <select name="role" class="form-select shadow-sm w-100">
+        <select name="role" class="form-control shadow-sm w-100">
           <option value="">All Roles</option>
           @foreach($roles as $role)
             <option value="{{ $role }}" {{ $selectedRole === $role ? 'selected' : '' }}>
@@ -31,9 +31,9 @@ Attendance - HMS Tech  & Solutions
         </select>
       </div>
       <div class="col">
+        <small class="text-muted d-block">Yesterday: {{ \Carbon\Carbon::yesterday()->toDateString() }}</small>
         <label class="form-label fw-bold mb-1">Select Date</label>
         <input type="date" name="date" class="form-control shadow-sm w-100" value="{{ $date }}">
-        <small class="text-muted d-block">Yesterday: {{ \Carbon\Carbon::yesterday()->toDateString() }}</small>
       </div>
       <div class="col">
         <label class="form-label fw-bold mb-1 invisible">Filter</label>

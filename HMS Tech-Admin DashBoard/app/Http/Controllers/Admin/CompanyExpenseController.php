@@ -36,7 +36,12 @@ class CompanyExpenseController extends Controller
         ]);
 
         $data = $request->only([
-            'title', 'description', 'amount', 'currency', 'category', 'date',
+            'title',
+            'description',
+            'amount',
+            'currency',
+            'category',
+            'date',
         ]);
 
         if ($request->hasFile('receipt_file')) {
@@ -64,7 +69,12 @@ class CompanyExpenseController extends Controller
         ]);
 
         $data = $request->only([
-            'title', 'description', 'amount', 'currency', 'category', 'date',
+            'title',
+            'description',
+            'amount',
+            'currency',
+            'category',
+            'date',
         ]);
 
         if ($request->hasFile('receipt_file')) {
@@ -107,8 +117,7 @@ class CompanyExpenseController extends Controller
             mkdir($path, 0755, true);
         }
 
-        $file->move($path, $filename);
-
-        return 'uploads/expenses/receipts/' . $filename;
+        $file->storeAs('expenses/receipts', $filename, 'public');
+        return 'expenses/receipts/' . $filename;
     }
 }

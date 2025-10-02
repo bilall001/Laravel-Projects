@@ -26,10 +26,10 @@ class UpdateCryptoPrices extends Command
 
                 Price::create([
                     'cryptocurrency_id' => $crypto->id,
-                    'price_usd' => $priceData['usd'],
-                    'market_cap' => $priceData['usd_market_cap'] ?? null,
-                    'change_24h' => $priceData['usd_24h_change'] ?? null,
-                    'fetched_at' => now(),
+                    'price_usd'   => $priceData['usd'],
+                    'market_cap'  => $priceData['usd_market_cap'] ?? null,
+                    'change_24h'  => $priceData['usd_24h_change'] ?? null,
+                    'fetched_at'  => now(),
                 ]);
 
                 $this->info("Updated price for {$crypto->name}: \${$priceData['usd']}");

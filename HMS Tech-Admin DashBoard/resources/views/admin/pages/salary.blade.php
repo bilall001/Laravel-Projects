@@ -4,7 +4,7 @@ Salaries - HMS Tech & Solutions
 @endsection
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid mt-3">
     <h4 class="page-title mb-4">💰 Salary Management</h4>
 
     {{-- Filter --}}

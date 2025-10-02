@@ -17,6 +17,11 @@ use Illuminate\Database\Eloquent\Model;
         'notes',
     ];
 
+    public function companyExpense()
+    {
+        return $this->hasOne(CompanyExpense::class, 'developer_payment_id');
+    }
+    
     public function developer()
     {
         return $this->belongsTo(Developer::class);

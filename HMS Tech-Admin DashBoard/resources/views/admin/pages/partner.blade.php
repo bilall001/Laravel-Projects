@@ -12,81 +12,100 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-      @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
-    <button class="btn btn-success mb-3" id="openCreateModal">
-        <i class="fas fa-plus"></i> Add Partner
-    </button>
-@endif
+        @if (auth()->user()->role === 'admin' ||
+                auth()->user()->role === 'business developer' ||
+                auth()->user()->role === 'team manager')
+            <button class="btn btn-success mb-3" id="openCreateModal">
+                <i class="fas fa-plus"></i> Add Partner
+            </button>
+        @endif
 
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Investments</th>
-                        @if (auth()->user()->role === 'admin')
-                        <th>Actions</th>
-                        @endif
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($partners as $partner)
-                        <tr>
-                            <td>
-                                @if ($partner->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($partner->image))
-                                    <img src="{{ asset('storage/' . $partner->image) }}" width="50" height="50"
-                                        alt="Partner Image">
-                                @else
-                                    N/A
+        <div class="card border-0 shadow-sm">
+            <!-- Card Header -->
+            <div class="card-header bg-dark border-bottom">
+                <h5 class="mb-0 text-white">Partner List</h5>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Profit %</th>
+                                <th>Investments</th>
+                                @if (auth()->user()->role === 'admin')
+                                    <th>Actions</th>
                                 @endif
-                            </td>
-                            <td>{{ $partner->user?->name ?? 'N/A' }}</td>
-                            <td>{{ $partner->user?->email ?? 'N/A' }}</td>
-                            <td>
-                                @foreach ($partner->investments as $inv)
-                                    <div class="border p-2 mb-2">
-                                        <strong>Amount:</strong> ${{ $inv->contribution }}<br>
-                                        <strong>Date:</strong> {{ $inv->contribution_date }}<br>
-                                        <strong>Method:</strong> {{ $inv->payment_method }}<br>
-                                        @if (
-                                            $inv->payment_method === 'Account' &&
-                                                $inv->payment_receipt &&
-                                                Storage::disk('public')->exists($inv->payment_receipt))
-                                            <a href="{{ asset('storage/' . $inv->payment_receipt) }}" target="_blank">View
-                                                Receipt</a><br>
-                                        @elseif($inv->payment_method === 'Account')
-                                            <span class="text-muted">Receipt not available</span><br>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($partners as $partner)
+                                <tr>
+                                    <td>
+                                        @if ($partner->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($partner->image))
+                                            <img src="{{ asset('storage/' . $partner->image) }}" width="50"
+                                                height="50" alt="Partner Image">
+                                        @else
+                                            N/A
                                         @endif
-                                        <strong>Status:</strong> {{ $inv->is_received ? 'Received' : 'Pending' }}
-                                    </div>
-                                @endforeach
-                            </td>
-                            @if (auth()->user()->role === 'admin')
-                            <td>
-
-                                <div class="d-flex align-items-center gap-1">
-                                    <button type="submit" class="btn btn-sm btn-light" title="edit"
-                                        onclick="openEditModal({{ $partner->load('investments')->toJson() }})">
-                                        <i class="fas fa-edit text-info"></i>
-                                    </button>
-                                    <form action="{{ route('admin.partners.destroy', $partner->id) }}" method="POST"
-                                        onsubmit="return confirm('Are you sure?');" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-light" title="Delete">
-                                            <i class="fas fa-trash text-danger"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                    </td>
+                                    <td>{{ $partner->user?->name ?? 'N/A' }}</td>
+                                    <td>{{ $partner->user?->email ?? 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ $partner->profit_percentage }}%</span>
+                                    </td>
+                                    <td>
+                                        @foreach ($partner->investments as $inv)
+                                            <div class="border p-2 mb-2">
+                                                <strong>Amount:</strong> ${{ $inv->contribution }}<br>
+                                                <strong>Date:</strong> {{ $inv->contribution_date }}<br>
+                                                <strong>Method:</strong> {{ $inv->payment_method }}<br>
+                                                @if (
+                                                    $inv->payment_method === 'Account' &&
+                                                        $inv->payment_receipt &&
+                                                        Storage::disk('public')->exists($inv->payment_receipt))
+                                                    <a href="{{ asset('storage/' . $inv->payment_receipt) }}"
+                                                        target="_blank">View
+                                                        Receipt</a><br>
+                                                @elseif($inv->payment_method === 'Account')
+                                                    <span class="text-muted">Receipt not available</span><br>
+                                                @endif
+                                                <strong>Status:</strong> {{ $inv->is_received ? 'Received' : 'Pending' }}
+                                            </div>
+                                        @endforeach
+                                    </td>
+                                    @if (auth()->user()->role === 'admin')
+                                        <td>
+                                            <div class="d-flex align-items-center gap-1">
+                                                <button type="submit" class="btn btn-sm btn-light" title="edit"
+                                                    onclick="openEditModal({{ $partner->load('investments')->toJson() }})">
+                                                    <i class="fas fa-edit text-info"></i>
+                                                </button>
+                                                <form action="{{ route('admin.partners.destroy', $partner->id) }}"
+                                                    method="POST" onsubmit="return confirm('Are you sure?');"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-light" title="Delete">
+                                                        <i class="fas fa-trash text-danger"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
+
     </div>
 
     <!-- Modal -->
@@ -134,6 +153,12 @@
                             <input type="file" name="image" class="form-control-file">
                             <img id="image-preview" style="max-width: 100px; margin-top: 10px;" hidden>
                         </div>
+                        <div class="form-group">
+                            <label>Profit Percentage</label>
+                            <input type="number" name="profit_percentage" class="form-control"
+                                value="{{ old('profit_percentage', $partner->profit_percentage ?? 0) }}" min="0"
+                                max="100" step="0.01" required>
+                        </div>
 
                         <hr>
                         <h5>Investments</h5>
@@ -156,9 +181,11 @@
                                         <option value="Account">Account</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-3 receipt-group" id="receipt-group-0" style="display: none;">
+                                <div class="form-group col-md-3 receipt-group" id="receipt-group-0"
+                                    style="display: none;">
                                     <label>Receipt</label>
-                                    <input type="file" name="investments[0][payment_receipt]" class="form-control-file">
+                                    <input type="file" name="investments[0][payment_receipt]"
+                                        class="form-control-file">
                                 </div>
                                 <div class="form-group col-md-2">
                                     <label>Status</label><br>

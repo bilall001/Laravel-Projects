@@ -127,6 +127,10 @@
                             class="align-self-center fw-semibold text-uppercase icon-xs icon-dual mr-1"> Hi,
                             {{ Auth::user()->name ?? 'HMS' }}</a>
                         <div class="dropdown-divider mb-0"></div>
+                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                            <i data-feather="user" class="align-self-center icon-xs icon-dual mr-1"></i> Profile
+                        </a>
+                        <div class="dropdown-divider mb-0"></div>
 
                         <!-- ✅ Use a form for logout -->
                         <form method="POST" action="{{ route('logout') }}">

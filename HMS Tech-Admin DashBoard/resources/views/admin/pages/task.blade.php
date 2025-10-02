@@ -6,37 +6,58 @@
         .select2-container--default .select2-selection--multiple {
             min-height: 38px;
         }
+
         /* Inside the Quill editor while editing */
-  .quill-editor .ql-editor img {
-    max-width: 100%;
-    height: auto;
-    max-height: 380px;        /* tweak to taste */
-    display: block;
-    margin: .5rem auto;       /* center + spacing */
-    border-radius: 6px;
-  }
+        .quill-editor .ql-editor img {
+            max-width: 100%;
+            height: auto;
+            max-height: 380px;
+            /* tweak to taste */
+            display: block;
+            margin: .5rem auto;
+            /* center + spacing */
+            border-radius: 6px;
+        }
 
-  /* Read-only render (show modal / index previews) */
-  .ql-render img,
-  .task-body img {
-    max-width: 100%;
-    height: auto;
-    max-height: 480px;        /* a bit taller for reading */
-    display: block;
-    margin: .5rem auto;
-    border-radius: 6px;
-  }
+        /* Read-only render (show modal / index previews) */
+        .ql-render img,
+        .task-body img {
+            max-width: 100%;
+            height: auto;
+            max-height: 480px;
+            /* a bit taller for reading */
+            display: block;
+            margin: .5rem auto;
+            border-radius: 6px;
+        }
 
-  /* Optional: prevent the editor container from stretching too tall */
-  .quill-editor {
-    max-height: 60vh;
-    overflow: auto;
-  }
+        /* Optional: prevent the editor container from stretching too tall */
+        .quill-editor {
+            max-height: 60vh;
+            overflow: auto;
+        }
+        /* Make table horizontally scrollable within card */
+.table-responsive {
+    overflow-x: auto;
+}
+ .assignees-col,
+ .badge {
+    white-space: normal !important;
+    word-break: break-word;
+    max-width: 220px;
+      /* display: inline-block; */
+    margin: 2px 2px;
+    white-space: normal; /* so text can break */
+}
+
+
+/* Allow badges to wrap inside table cells */
+
     </style>
 @endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid mt-3">
         <div class="row mb-3">
             <div class="col-md-6">
                 <h4 class="page-title">Tasks</h4>
@@ -62,13 +83,13 @@
         <div class="card">
             <div class="card-header text-white" style="background-color:#1D2C48">All Tasks</div>
             <div class="card-body table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-responsive table-hover mb-0">
                     <thead class="table-primary">
                         <tr>
                             <th>Title</th>
                             <th>Project</th>
                             <th>Teams</th>
-                            <th>Assignees</th>
+                            <th class="assignees-col">Assignees</th>
                             <th>Roles</th>
                             <th>Status</th>
                             <th>Priority</th>
@@ -95,15 +116,15 @@
                                         </span>
                                     @endforeach
                                 </td>
-                              <td>
-    @forelse ($task->getRolesForAssignees() as $mr)
-        <span class="badge bg-info">
-            {{ $mr->developer?->user?->name }} → {{ $mr->role?->name }}
-        </span>
-    @empty
-        <span class="text-muted">Unassigned</span>
-    @endforelse
-</td>
+                                <td>
+                                    @forelse ($task->getRolesForAssignees() as $mr)
+                                        <span class="badge bg-info">
+                                            {{ $mr->developer?->user?->name }} → {{ $mr->role?->name }}
+                                        </span>
+                                    @empty
+                                        <span class="text-muted">Unassigned</span>
+                                    @endforelse
+                                </td>
                                 <td>
                                     <span
                                         class="badge
@@ -183,10 +204,10 @@
                                                     </p>
                                                     <p><strong>Created By:</strong> {{ $task->creator->name ?? '-' }}</p>
                                                 </div>
-                                               
+
                                             </div>
                                             <hr>
-                                            
+
                                             <div>
                                                 <strong>Description</strong>
                                                 <div class="ql-render border rounded p-3" style="min-height:120px;">
@@ -287,9 +308,6 @@ $selectedIds = $task->assignees->pluck('id')->map(fn($v) => (string) $v)->toArra
                                                             <input type="checkbox"
                                                                 id="edit-show-only-members-{{ $task->id }}"
                                                                 class="custom-control-input" checked>
-                                                            <label class="custom-control-label"
-                                                                for="edit-show-only-members-{{ $task->id }}">Show only
-                                                                members of the selected team(s)</label>
                                                         </div>
                                                     </div>
                                                 @endif
@@ -318,12 +336,7 @@ $selectedIds = $task->assignees->pluck('id')->map(fn($v) => (string) $v)->toArra
                                                         <input type="checkbox" id="assignAll-{{ $task->id }}"
                                                             class="custom-control-input" name="assign_all_team_members"
                                                             value="1">
-                                                        <label class="custom-control-label"
-                                                            for="assignAll-{{ $task->id }}">Also assign to all members
-                                                            of the selected team(s)</label>
                                                     </div>
-                                                    <small class="text-muted">If checked, team members will be added to
-                                                        assignees on save.</small>
                                                 </div>
 
                                                 {{-- Quill --}}

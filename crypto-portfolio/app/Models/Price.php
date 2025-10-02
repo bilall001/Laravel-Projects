@@ -13,4 +13,11 @@ class Price extends Model
         'change_24h',
         'fetched_at',
     ];
+      protected $casts = [
+        'fetched_at' => 'datetime',
+    ];
+    public function cryptocurrency()
+{
+    return $this->belongsToMany(Cryptocurrency::class);
+}
 }

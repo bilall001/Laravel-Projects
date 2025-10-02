@@ -1,5 +1,5 @@
 @extends('admin.layouts.main')
-
+@section('title', 'Developer Dashboard')
 @section('content')
     @if (Auth::user()->role === 'developer')
         <div class="container-fluid py-4">
@@ -88,6 +88,44 @@
                     </div><!--end card-->
                 </div> <!--end col-->
             </div><!--end row-->
+            <div class="row mt-4">
+    {{-- Total Points --}}
+    <div class="col-md-4">
+        <div class="card report-card shadow">
+            <div class="card-body text-center">
+                <p class="text-dark mb-1 font-weight-semibold">🌟 Total Points</p>
+                <h3 class="{{ $totalPoints >= 0 ? 'text-success' : 'text-danger' }}">
+                    {{ $totalPoints }}
+                </h3>
+                <small class="text-muted">
+                    {{ $totalPoints >= 0 ? 'Great job! Keep it up 🎉' : '⚠ Try to avoid late submissions' }}
+                </small>
+            </div>
+        </div>
+    </div>
+
+    {{-- Submissions Made --}}
+    <div class="col-md-4">
+        <div class="card report-card shadow">
+            <div class="card-body text-center">
+                <p class="text-dark mb-1 font-weight-semibold">📁 Submissions</p>
+                <h3>{{ $submissionsCount }}</h3>
+                <small class="text-muted">Total projects submitted</small>
+            </div>
+        </div>
+    </div>
+
+    {{-- Best Score --}}
+    <div class="col-md-4">
+        <div class="card report-card shadow">
+            <div class="card-body text-center">
+                <p class="text-dark mb-1 font-weight-semibold">🏆 Best Score</p>
+                <h3 class="text-primary">{{ $bestScore }}</h3>
+                <small class="text-muted">Highest points earned in one submission</small>
+            </div>
+        </div>
+    </div>
+</div>
 
             {{-- 🔹 My Projects --}}
             <div class="card shadow mb-4">
@@ -112,7 +150,7 @@
                             @forelse($allProjects as $project)
                                 <tr>
                                     <td>{{ $project->title }}</td>
-                                    <td>{{ Str::limit($project->description, 40) ?? '-' }}</td>
+                                    <td>{{ Str::limit(strip_tags($project->body_html), 40) ?? '-' }}</td>
                                     <td>{{ ucfirst($project->type) }}</td>
                                     <td>{{ $project->team?->name ?? '-' }}</td>
                                     <td>{{ $project->businessDeveloper?->name ?? '-' }}</td>
@@ -167,17 +205,68 @@
                     <tr>
                         <td>{{ $team->name }}</td>
                         <td>
-                            @forelse($team->users as $user)
-                                <span class="badge bg-info text-dark">{{ $user->name }}</span>
-                            @empty
-                                <span class="text-muted">No other developers</span>
-                            @endforelse
+                            @forelse($team->developers as $dev)
+        @if($dev->id !== $developer->id) {{-- skip current developer --}}
+            <span class="badge bg-info text-dark">{{ $dev->name }}</span>
+        @endif
+    @empty
+        <span class="text-muted">No other developers</span>
+    @endforelse
                         </td>
-                        <td>{{ $team->users->count() + 1 }}</td> {{-- +1 for current developer --}}
+                        <td>{{ $team->developers->count() }}</td> {{-- +1 for current developer --}}
                     </tr>
                 @empty
                     <tr>
                         <td colspan="3" class="text-center text-muted">You are not part of any team.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+    <div class="card shadow mb-4">
+    <div class="card-header bg-secondary text-white fw-semibold">
+        <i class="bi bi-list-task me-2"></i> My Tasks
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Project</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Assigned By</th>
+                    <th>Assignment Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($allTasks as $task)
+                    <tr>
+                        <td>{{ $task->title }}</td>
+                        <td>{{ $task->project?->title ?? '-' }}</td>
+                        <td>
+                            <span class="badge 
+                                {{ $task->priority === 'high' ? 'bg-danger' : 
+                                   ($task->priority === 'medium' ? 'bg-warning' : 'bg-success') }}">
+                                {{ ucfirst($task->priority) }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {{ $task->status === 'completed' ? 'bg-success' : 
+                                   ($task->status === 'inprogress' ? 'bg-warning' : 'bg-secondary') }}">
+                                {{ ucfirst($task->status) }}
+                            </span>
+                        </td>
+                        <td>{{ $task->due_date ?? '-' }}</td>
+                        <td>{{ $task->created_by ?? '-' }}</td>
+                        <td><span class="badge bg-info">{{ $task->assignment_type }}</span></td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No tasks assigned yet.</td>
                     </tr>
                 @endforelse
             </tbody>

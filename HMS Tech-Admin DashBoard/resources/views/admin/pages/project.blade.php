@@ -37,7 +37,7 @@
     </style>
 @endsection
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid mt-3">
         <div class="row mb-3">
             <div class="col-md-6">
                 <h4 class="page-title">Projects</h4>
@@ -66,7 +66,6 @@
                                 <th>File</th>
                                 <th>Teams</th>
                                 <th>Developers</th>
-                                <th>Roles</th>
                                 <th>Total Price</th>
                                 <th>Paid Price</th>
                                 <th>Remaining Price</th>
@@ -102,18 +101,11 @@
                                             -
                                         @endforelse
                                     </td>
-                                    <td>
-                                        @foreach ($project->memberRoles as $mr)
-                                            <span class="badge bg-info">
-                                                {{ $mr->developer?->user?->name }} → {{ $mr->role?->name }}
-                                            </span>
-                                        @endforeach
-                                    </td>
-                                    <td>${{ number_format($project->price, 2) }}</td>
-                                    <td>${{ number_format($project->paid_price, 2) }}</td>
+                                    <td>PKR {{ number_format($project->price, 2) }}</td>
+                                    <td>PKR {{ number_format($project->paid_price, 2) }}</td>
                                     <td>
                                         @if ($project->remaining_price >= 0)
-                                            ${{ number_format($project->remaining_price, 2) }}
+                                            PKR {{ number_format($project->remaining_price, 2) }}
                                         @else
                                             <span class="text-danger">Overpaid</span>
                                         @endif
@@ -174,7 +166,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{{ $editProject ? 'Edit Project' : 'Add Project' }}</h5>
-                            <button type="button" class="btn-close" id="closeProjectModalBtn" aria-label="Close"></button>
+                            <button type="button" class="btn-close" id="closeProjectModalBtn" aria-label="Close">x</button>
                         </div>
                         <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
                             @if ($errors->any())
@@ -210,7 +202,7 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Remaining Price</label><br>
-                                    <strong id="remaining-display">$0.00</strong>
+                                    <strong id="remaining-display">PKR 0.00</strong>
                                     <small class="text-muted d-block">Automatically calculated</small>
                                 </div>
                             </div>
@@ -446,6 +438,25 @@
                                     class="btn btn-outline-primary btn-sm">View File</a>
                             </p>
                         @endif
+                        @if ($showProject->memberRoles && $showProject->memberRoles->count())
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-header bg-light fw-bold">👥 Assigned Roles</div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach ($showProject->memberRoles as $mr)
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>
+                                                    <strong>{{ $mr->developer?->user?->name }}</strong>
+                                                </span>
+                                                <span class="badge bg-primary">{{ $mr->role?->name }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        @endif
+
+
                         {{-- RICH TEXT (read-only) --}}
                         @if ($showProject->body_html)
                             <div class="mb-3">
@@ -456,6 +467,7 @@
                             </div>
                         @endif
                     </div>
+
                     <div class="modal-footer bg-light rounded-bottom">
                         <button type="button" class="btn btn-secondary px-4"
                             id="cancelShowProjectModalBtn">Close</button>

@@ -35,4 +35,8 @@ class Team extends Model
         return $this->belongsToMany(Task::class, 'task_teams', 'team_id', 'task_id')
                    ;
     }
+     public function points()
+    {
+        return $this->hasMany(Point::class, 'team_id');
+    }
 }

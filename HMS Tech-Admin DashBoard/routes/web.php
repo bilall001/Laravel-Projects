@@ -28,6 +28,8 @@ use App\Http\Controllers\Admin\TeamManagerDashboardController;
 use App\Http\Controllers\Admin\KhataAccountController;
 use App\Http\Controllers\Admin\KhataEntryController;
 use App\Http\Controllers\Admin\ImpersonationController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProfitController;
 use App\Http\Controllers\Admin\ProjectRoleController;
 use App\Http\Controllers\Admin\TaskAssetController;
 
@@ -77,6 +79,10 @@ Route::middleware(['auth'])->group(function () {
     // Passwords
     Route::resource('passwords', PasswordControler::class);
 
+    // Profile
+     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     // Add Users
     Route::resource('add-users', AddUserController::class)->except(['create']);
 
@@ -94,9 +100,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/khata/accounts',          [KhataAccountController::class, 'index'])->name('khata.accounts.index');
     Route::post('/khata/accounts',         [KhataAccountController::class, 'store'])->name('khata.accounts.store');
     Route::get('/khata/accounts/{id}/modal', [KhataAccountController::class, 'showModal'])
-         ->name('khata.accounts.modal');
+        ->name('khata.accounts.modal');
     Route::patch('/khata/accounts/{id}',   [KhataAccountController::class, 'update'])->name('khata.accounts.update');
     Route::delete('/khata/accounts/{id}',  [KhataAccountController::class, 'destroy'])->name('khata.accounts.destroy');
+
 
     // Entries
     Route::post('/khata/accounts/{khataAccountId}/entries', [KhataEntryController::class, 'store'])->name('khata.entries.store');
@@ -127,19 +134,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/projects/{project}/roles', [ProjectRoleController::class, 'index'])->name('projects.roles.index');
     Route::post('/projects/{project}/roles/assign/devs', [ProjectRoleController::class, 'assignToDevelopers'])->name('projects.roles.assign.devs');
     Route::post('/projects/{project}/roles/assign/teams', [ProjectRoleController::class, 'assignToTeams'])->name('projects.roles.assign.teams');
-    Route::post('/projects/{project}/roles/revoke/devs', [ProjectRoleController::class, 'revokeFromDevelopers'])->name('projects.roles.revoke.devs'); 
+    Route::post('/projects/{project}/roles/revoke/devs', [ProjectRoleController::class, 'revokeFromDevelopers'])->name('projects.roles.revoke.devs');
     // project text images
     Route::post('/projects/assets/upload', [\App\Http\Controllers\Admin\ProjectAssetController::class, 'store'])
-  ->name('projects.assets.upload');
-  Route::delete('/projects/assets/{asset}', [\App\Http\Controllers\Admin\ProjectAssetController::class, 'destroy'])
-    ->name('projects.assets.destroy');
+        ->name('projects.assets.upload');
+    Route::delete('/projects/assets/{asset}', [\App\Http\Controllers\Admin\ProjectAssetController::class, 'destroy'])
+        ->name('projects.assets.destroy');
     // roles
     Route::prefix('projects/{project}/roles')->name('admin.projects.roles.')->group(function () {
-    Route::get('/', [ProjectRoleController::class, 'index'])->name('index');
-    Route::post('/assign-developers', [ProjectRoleController::class, 'assignToDevelopers'])->name('assignToDevelopers');
-    Route::post('/assign-teams', [ProjectRoleController::class, 'assignToTeams'])->name('assignToTeams');
-    Route::post('/revoke', [ProjectRoleController::class, 'revokeFromDevelopers'])->name('revokeFromDevelopers');
-});
+        Route::get('/', [ProjectRoleController::class, 'index'])->name('index');
+        Route::post('/assign-developers', [ProjectRoleController::class, 'assignToDevelopers'])->name('assignToDevelopers');
+        Route::post('/assign-teams', [ProjectRoleController::class, 'assignToTeams'])->name('assignToTeams');
+        Route::post('/revoke', [ProjectRoleController::class, 'revokeFromDevelopers'])->name('revokeFromDevelopers');
+    });
 
     // Company Expenses
     Route::resource('companyExpense', CompanyExpenseController::class);
@@ -173,6 +180,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/developer/points', [PointsController::class, 'storeFromDeveloper'])->name('developer.points.store');
     Route::delete('/developer/points/{id}', [PointsController::class, 'destroy'])->name('developer.points.destroy');
     Route::get('/points/get-projects', [PointsController::class, 'getProjectsForDeveloper']);
+    Route::put('/developer/points/{id}', [PointsController::class, 'update'])->name('developer.points.update');
+    Route::get('/admin/developer-points', [PointsController::class, 'indexForAdmin'])
+        ->name('admin.developer.points'); // you can also restrict to role:admin
 
     // Project Schedule
     Route::resource('projectSchedule', ProjectScheduleController::class);
@@ -191,14 +201,14 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/', [AdminController::class, 'TotalCLients'])->name('admin.dashboard');
 
-    //     Route::get('/tasks', [TaskController::class, 'index'])->name('admin.tasks.index');
-    //     Route::post('/tasks', [TaskController::class, 'store'])->name('admin.tasks.store');
-    //     Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('admin.tasks.edit');
-    //     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('admin.tasks.update');
-    //     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('admin.tasks.destroy');
+        //     Route::get('/tasks', [TaskController::class, 'index'])->name('admin.tasks.index');
+        //     Route::post('/tasks', [TaskController::class, 'store'])->name('admin.tasks.store');
+        //     Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('admin.tasks.edit');
+        //     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('admin.tasks.update');
+        //     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('admin.tasks.destroy');
 
-    //     Route::get('/project-files/{filename}', [TaskController::class, 'viewProjectFile'])
-    //         ->name('projects.view_file');
+        //     Route::get('/project-files/{filename}', [TaskController::class, 'viewProjectFile'])
+        //         ->name('projects.view_file');
     });
 
     // Extra task routes
@@ -215,7 +225,12 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('partners', PartnerController::class);
     });
 });
-
+Route::prefix('admin/profits')->name('admin.profits.')->group(function() {
+    Route::get('/', [ProfitController::class, 'index'])->name('index');
+    Route::post('/generate', [ProfitController::class, 'generateMonthlyProfit'])->name('generate');
+    Route::put('/{id}/received', [ProfitController::class, 'markReceived'])->name('received');
+    Route::put('/{id}/reinvest', [ProfitController::class, 'markReinvested'])->name('reinvest');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('business-developers', BusinessDeveloperController::class);

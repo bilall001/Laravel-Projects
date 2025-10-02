@@ -45,6 +45,7 @@ public function index()
         $validated = $request->validate([
             'user_id' => 'required|exists:add_users,id',
             'image' => 'nullable|image|max:2048',
+            'profit_percentage' => 'required|numeric|min:0|max:100',
             'investments.*.contribution' => 'required|numeric',
             'investments.*.contribution_date' => 'required|date',
             'investments.*.payment_method' => 'required|string',
@@ -53,6 +54,7 @@ public function index()
 
         $partnerData = [
             'user_id' => $request->user_id,
+            'profit_percentage' => $request->profit_percentage,
         ];
 
         if ($request->hasFile('image')) {
@@ -88,6 +90,7 @@ public function index()
     $validated = $request->validate([
         'user_id' => 'required|exists:add_users,id',
         'image' => 'nullable|image|max:2048',
+        'profit_percentage' => 'required|numeric|min:0|max:100',
         'investments.*.contribution' => 'required|numeric',
         'investments.*.contribution_date' => 'required|date',
         'investments.*.payment_method' => 'required|string',
@@ -96,6 +99,7 @@ public function index()
 
     $partnerData = [
         'user_id' => $request->user_id,
+        'profit_percentage' => $request->profit_percentage,
     ];
 
     if ($request->hasFile('image')) {

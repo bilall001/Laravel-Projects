@@ -105,6 +105,13 @@
                                 Manage Partners
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('admin.profits.index') }}">
+                                <i class="bi bi-people"
+                                    style="font-size: 18px; vertical-align: middle; margin-right:8px;"></i>
+                                Manage Partners Profit
+                            </a>
+                        </li>
 
                         <!-- Manage Business Developers -->
                         <li>
@@ -166,7 +173,7 @@
 
                         <!-- Developer Points -->
                         <li>
-                            <a href="{{ route('developer.points') }}">
+                            <a href="{{ route('admin.developer.points') }}">
                                 <i class="mdi mdi-star-outline" style="font-size: 18px;"></i> Developer Points
                             </a>
                         </li>

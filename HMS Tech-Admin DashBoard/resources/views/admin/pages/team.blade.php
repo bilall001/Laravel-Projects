@@ -3,10 +3,10 @@
 @extends('admin.layouts.main')
 @section('title') Teams - HMS Tech & Solutions @endsection
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid mt-3">
   <div class="row mb-4 align-items-center">
     <div class="col-md-6">
-      <h4 class="page-title mb-0 text-primary fw-bold">Teams Management</h4>
+      <h4 class="page-title mb-0 text-dark fw-bold">Teams Management</h4>
     </div>
     @if (auth()->user()->role === 'admin' || auth()->user()->role === 'business developer' || auth()->user()->role === 'team manager')
     <div class="col-md-6 d-flex justify-content-end">
@@ -91,7 +91,7 @@
       <input type="hidden" name="_method" id="formMethod" value="POST">
       <div class="modal-content shadow">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="teamModalTitle">Add New Team</h5>
+          <h5 class="modal-title text-white" id="teamModalTitle">Add New Team</h5>
           <button type="button" id="closeTeamModalBtn" class="btn btn-sm" aria-label="Close">
             <i class="fas fa-times text-light fs-5"></i>
           </button>
@@ -103,13 +103,13 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-bold">Choose Developers (Members) *</label>
+            <label class="form-label fw-bold">Choose Developers*</label>
             <div class="input-group">
-              <select class="form-select" id="userSelect">
+              <select class="form-control" id="userSelect">
                 <option value="">-- Select Developer --</option>
                 @foreach ($developers as $dev)
                   <option value="{{ $dev->id }}" data-name="{{ $dev->user->name ?? 'Unnamed' }}">
-                    {{ $dev->user->name ?? 'Unnamed' }} (Dev#{{ $dev->id }})
+                    {{ $dev->user->name ?? 'Unnamed' }}
                   </option>
                 @endforeach
               </select>
@@ -124,7 +124,7 @@
 
           <div class="mb-3">
             <label class="form-label fw-bold">Team Lead</label>
-            <select name="team_lead_id" id="teamLeadSelect" class="form-select">
+            <select name="team_lead_id" id="teamLeadSelect" class="form-control">
               <option value="">-- Select Team Lead --</option>
               @foreach ($developers as $dev)
                 <option value="{{ $dev->id }}">{{ $dev->user->name ?? 'Unnamed' }}</option>

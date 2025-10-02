@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid mt-3">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="page-title">👥 Manage Leads</h4>
             @if (auth()->user()->role === 'admin' ||
@@ -69,8 +69,13 @@
                                             data-person="{{ $lead->contact_person }}"
                                             data-email="{{ $lead->contact_email }}"
                                             data-phone="{{ $lead->contact_phone }}"
-                                            data-follow="{{ $lead->next_follow_up }}" data-notes="{{ $lead->notes }}"
-                                            data-platform='@json($lead->{$lead->lead_get_by} ?? [])' title="Edit">
+                                            data-business-developer-id="{{ $lead->business_developer_id }}"
+                                            data-lead-type="{{ $lead->project_id ? 'existing' : 'new' }}"
+                                            {{-- 👈 new --}} data-project-id="{{ $lead->project_id ?? '' }}"
+                                            {{-- 👈 new --}} data-client-id="{{ $lead->client_id ?? '' }}"
+                                            {{-- 👈 new --}} data-follow="{{ $lead->next_follow_up }}"
+                                            data-notes="{{ $lead->notes }}" data-platform='@json($lead->{$lead->lead_get_by} ?? [])'
+                                            title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
 
@@ -411,9 +416,9 @@
                     <div class="modal-content shadow-lg border-0 rounded-3">
                         <div class="modal-header bg-primary text-white rounded-top">
                             <h5 class="modal-title fw-bold"><i class="fas fa-user"></i> Lead Details</h5>
-                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-+   <span aria-hidden="true">&times;</span>
-+ </button>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                + <span aria-hidden="true">&times;</span>
+                                + </button>
                         </div>
 
                         <div class="modal-body p-4" style="font-family: 'Poppins', sans-serif;">
@@ -422,6 +427,8 @@
                                 <div class="card-header bg-light fw-bold">General Information</div>
                                 <div class="card-body row">
                                     <div class="col-md-4"><strong>📌 Title:</strong> {{ $lead->lead_title ?? '-' }}</div>
+                                    <div class="col-md-4"><strong>📌 Lead:</strong>
+                                        {{ $lead->businessDeveloper->user->name ?? '-' }}</div>
                                     <div class="col-md-4"><strong>📊 Status:</strong> {{ ucfirst($lead->status) ?? '-' }}
                                     </div>
                                     <div class="col-md-4"><strong>📥 Source:</strong>
@@ -522,7 +529,7 @@
                         </div>
 
                         <div class="modal-footer bg-light rounded-bottom">
-                           <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -597,6 +604,8 @@
                     modal.querySelector("[name='lead_title']").value = this.dataset.title;
                     modal.querySelector("[name='lead_description']").value = this.dataset
                         .description;
+                    modal.querySelector("[name='business_developer_id']").value = this.dataset
+                        .businessDeveloperId;
                     modal.querySelector("[name='status']").value = this.dataset.status;
                     modal.querySelector("[name='lead_get_by']").value = this.dataset.source;
                     modal.querySelector("[name='expected_budget']").value = this.dataset.budget;
@@ -606,7 +615,17 @@
                     modal.querySelector("[name='contact_phone']").value = this.dataset.phone;
                     modal.querySelector("[name='next_follow_up']").value = this.dataset.follow;
                     modal.querySelector("[name='notes']").value = this.dataset.notes;
+                    // Lead Type
+modal.querySelector("[name='lead_type']").value = this.dataset.leadType;
 
+// Project & Client (only if existing lead)
+if (this.dataset.leadType === 'existing') {
+    document.getElementById('project_id').value = this.dataset.projectId;
+    document.getElementById('client_id').value = this.dataset.clientId;
+    document.getElementById('projectClientWrapper').style.display = 'flex';
+} else {
+    document.getElementById('projectClientWrapper').style.display = 'none';
+}
                     // Show only relevant platform section
                     toggleFields();
 

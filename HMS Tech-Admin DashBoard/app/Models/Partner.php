@@ -13,6 +13,7 @@ class Partner extends Authenticatable
     protected $fillable = [
         'user_id',
         'image',
+        'profit_percentage'
     ];
 
     public function investments()
@@ -23,4 +24,7 @@ class Partner extends Authenticatable
     {
         return $this->belongsTo(AddUser::class, 'user_id');
     }
+    public function partnerProfits() {
+    return $this->hasMany(PartnerProfit::class);
+}
 }

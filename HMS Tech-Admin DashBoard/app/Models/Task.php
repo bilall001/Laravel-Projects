@@ -21,7 +21,7 @@ class Task extends Model
     ];
     public function project()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Project::class,'project_id');
     }
 
     // people assigned to the task
@@ -37,7 +37,10 @@ class Task extends Model
         return $this->belongsToMany(Team::class, 'task_teams', 'task_id', 'team_id')
                    ;
     }
-
+    public function developers()
+{
+    return $this->belongsToMany(Developer::class, 'task_assignees', 'task_id', 'developer_id')->withTimestamps();
+}
     public function images()
     {
         return $this->hasMany(TaskImage::class);

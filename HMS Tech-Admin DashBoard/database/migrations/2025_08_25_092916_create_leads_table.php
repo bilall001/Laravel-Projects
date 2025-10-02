@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('set null');
             $table->foreignId('client_id')->nullable()->constrained('clients')->onDelete('set null');
 
-            $table->string('lead_title');
+            $table->string('lead_title')->nullable();
             $table->text('lead_description')->nullable();
 
             $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');

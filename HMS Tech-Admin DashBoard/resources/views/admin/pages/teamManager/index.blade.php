@@ -3,7 +3,7 @@
 Team Manager - HMS Tech  & Solutions
 @endsection
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid mt-3">
 
         {{-- Header --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -81,14 +81,6 @@ Team Manager - HMS Tech  & Solutions
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-1">
-                                        {{-- Edit --}}
-                                        {{-- <button class="btn btn-sm btn-light edit-team-manager-btn"
-                                            data-id="{{ $manager->id }}" data-user_id="{{ $manager->user_id }}"
-                                            data-team_id="{{ $manager->team_id }}" data-phone="{{ $manager->phone }}"
-                                            data-experience="{{ $manager->experience }}"
-                                            data-skill="{{ $manager->skill }}" title="Edit">
-                                            <i class="fas fa-edit text-info"></i>
-                                        </button> --}}
                                         <button class="btn btn-sm btn-light edit-team-manager-btn"
                                             data-id="{{ $manager->id }}" data-user_id="{{ $manager->user_id }}"
                                             data-teams='@json($manager->teams->pluck('id'))' data-phone="{{ $manager->phone }}"
@@ -150,7 +142,7 @@ Team Manager - HMS Tech  & Solutions
                         <div class="mb-3">
                             <label class="form-label fw-bold">Choose Teams *</label>
                             <div class="input-group">
-                                <select class="form-select" id="teamSelect">
+                                <select class="form-control" id="teamSelect">
                                     <option value="">-- Select Team --</option>
                                     @foreach ($teams as $team)
                                         <option value="{{ $team->id }}" data-name="{{ $team->name }}">
@@ -247,7 +239,7 @@ Team Manager - HMS Tech  & Solutions
                     document.getElementById('managerPhone').value = this.dataset.phone || '';
                     document.getElementById('managerExperience').value = this.dataset.experience ||
                         '';
-                    document.getElementById('managerSkill').value = this.dataset.skill || '';
+                    document.getElementById('managerSkill').value = this.dataset.skill1 || '';
 
                     modalTitle.textContent = 'Edit Team Manager';
                     teamManagerModal.show();

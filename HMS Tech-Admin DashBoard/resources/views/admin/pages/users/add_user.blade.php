@@ -181,7 +181,7 @@
                             </div>
                             <div class="mb-3">
                                 <label>Role</label>
-                                <select name="role" id="userRole" class="form-select" required>
+                                <select name="role" id="userRole" class="form-control" required>
                                     <option value="">-- Select Role --</option>
                                     @foreach (['admin', 'developer', 'client', 'team manager', 'business developer', 'partner'] as $role)
                                         <option value="{{ $role }}">{{ ucfirst($role) }}</option>

@@ -20,7 +20,7 @@ class AdminController extends Controller
         // Existing logic
         $clients = Client::count();
         $projects = Project::count();
-         $currentProjects = Project::whereHas('schedules', function ($query) {
+        $currentProjects = Project::whereHas('schedules', function ($query) {
             $query->where('status', 'inProgress');
         })->count();
 
@@ -34,8 +34,13 @@ class AdminController extends Controller
             'partners'   => Partner::all()->count(),
         ];
 
-        $totalIncome = Project::sum('price');
-        $monthExpense  = CompanyExpense::whereMonth('created_at', Carbon::now()->month)
+        $totalIncome = Project::whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('paid_price');
+
+        // Current month expenses
+        $monthExpense = CompanyExpense::whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
             ->sum('amount');
         $monthProfit = $totalIncome - $monthExpense;
 
@@ -44,7 +49,7 @@ class AdminController extends Controller
         $monthlyData = [];
 
         foreach (range(1, 12) as $month) {
-            $income = Project::whereMonth('created_at', $month)->whereYear('created_at', date('Y'))->sum('price');
+            $income = Project::whereMonth('created_at', $month)->whereYear('created_at', date('Y'))->sum('paid_price');
             $expense = CompanyExpense::whereMonth('created_at', $month)->whereYear('created_at', date('Y'))->sum('amount');
             $profit = $income - $expense;
             $profitPercentage = $income > 0 ? round(($profit / $income) * 100, 2) : 0;

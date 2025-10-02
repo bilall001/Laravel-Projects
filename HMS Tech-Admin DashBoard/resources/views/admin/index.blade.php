@@ -133,7 +133,7 @@
                         <div class="row d-flex justify-content-center">
                             <div class="col">
                                 <p class="text-dark mb-1 font-weight-semibold">Total Income</p>
-                                <h3 class="my-2">${{ $totalIncome }}</h3>
+                                <h3 class="my-2">PKR {{ $totalIncome }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
                                             class="mdi mdi-trending-up"></i></span>Total Income </p>
                             </div>
@@ -152,7 +152,7 @@
                         <div class="row d-flex justify-content-center">
                             <div class="col">
                                 <p class="text-dark mb-1 font-weight-semibold">Monthly Expense</p>
-                                <h3 class="my-2">${{ $monthExpense }}</h3>
+                                <h3 class="my-2">PKR {{ $monthExpense }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-success"><i
                                             class="mdi mdi-trending-up"></i></span>Monthly Expense</p>
                             </div>
@@ -171,7 +171,7 @@
                         <div class="row d-flex justify-content-center">
                             <div class="col">
                                 <p class="text-dark mb-1 font-weight-semibold">Monthly Profit</p>
-                                <h3 class="my-2">${{ $monthProfit }}</h3>
+                                <h3 class="my-2">PKR {{ $monthProfit }}</h3>
                                 <p class="mb-0 text-truncate text-muted"><span class="text-danger"><i
                                             class="mdi mdi-trending-down"></i></span> Monthly Profit</p>
                             </div>
